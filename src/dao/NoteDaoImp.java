@@ -17,12 +17,14 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public void add(Note entity) {
-        String sql = "INSERT INTO note (etudiant_id, matiere_id, note_finale) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO note (etudiant_id, matiere_id, note_ds, note_exam, note_finale) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, entity.getEtudiant().getId());
             ps.setInt(2, entity.getMatiere().getId());
-            ps.setDouble(3, entity.getValeur());
+            ps.setDouble(3, entity.getNoteDs());
+            ps.setDouble(4, entity.getNoteExamen());
+            ps.setDouble(5, entity.getMoyenne());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'ajout de la note", e);
@@ -67,13 +69,15 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public void update(Note entity) {
-        String sql = "UPDATE note SET etudiant_id = ?, matiere_id = ?, note_finale = ? WHERE id = ?";
+        String sql = "UPDATE note SET etudiant_id = ?, matiere_id = ?, note_ds = ?, note_exam = ?, note_finale = ? WHERE id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, entity.getEtudiant().getId());
             ps.setInt(2, entity.getMatiere().getId());
-            ps.setDouble(3, entity.getValeur());
-            ps.setInt(4, entity.getId());
+            ps.setDouble(3, entity.getNoteDs());
+            ps.setDouble(4, entity.getNoteExamen());
+            ps.setDouble(5, entity.getMoyenne());
+            ps.setInt(6, entity.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification de la note", e);
@@ -101,6 +105,8 @@ public class NoteDaoImp implements GenericDao<Note> {
 
         return new Note(
                 rs.getInt("id"),
+                rs.getDouble("note_ds"),
+                rs.getDouble("note_exam"),
                 rs.getDouble("note_finale"),
                 etudiant,
                 matiere,

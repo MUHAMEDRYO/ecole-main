@@ -18,8 +18,8 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
         String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ADMIN')";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getEmail());
-            ps.setString(2, entity.getNom());
+            ps.setString(1, entity.getUsername());
+            ps.setString(2, entity.getPassword());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'ajout du personnel", e);
@@ -67,8 +67,8 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
         String sql = "UPDATE utilisateur SET username = ?, password = ? WHERE id = ? AND role = 'ADMIN'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getEmail());
-            ps.setString(2, entity.getNom());
+            ps.setString(1, entity.getUsername());
+            ps.setString(2, entity.getPassword());
             ps.setInt(3, entity.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -89,10 +89,11 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
     }
 
     private Personnel mapPersonnel(ResultSet rs) throws SQLException {
-        Personnel personnel = new Personnel(0, null, null, null);
+        Personnel personnel = new Personnel();
         personnel.setId(rs.getInt("id"));
-        personnel.setNom(rs.getString("password"));
-        personnel.setEmail(rs.getString("username"));
+        personnel.setUsername(rs.getString("username"));
+        personnel.setPassword(rs.getString("password"));
+        personnel.setRole(rs.getString("role"));
         return personnel;
     }
 }

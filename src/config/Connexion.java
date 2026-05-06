@@ -24,7 +24,7 @@ public class Connexion {
                 String user = props.getProperty("jdbc.user");
                 String pass = props.getProperty("jdbc.password");
 
-                // Zid "jdbc:" ken mouch mawjouda
+
                 if (url != null && !url.startsWith("jdbc:")) {
                     url = "jdbc:" + url;
                 }

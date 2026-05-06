@@ -66,7 +66,7 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
 
     @Override
     public void update(Enseignant entity) {
-        String sql = "UPDATE enseignant SET nom = ?, prenom = ?, email = ?, grade = ? WHERE id = ?";
+        String sql = "UPDATE enseignant SET nom = ?, prenom = ?, email = ?, specialite = ? WHERE id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, entity.getNom());

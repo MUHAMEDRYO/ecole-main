@@ -15,11 +15,12 @@ public class UtilisateurDaoImp implements GenericDao<Utilisateur> {
 
     @Override
     public void add(Utilisateur entity) {
-        String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ETUDIANT')";
+        String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getEmail());
-            ps.setString(2, entity.getNom());
+            ps.setString(1, entity.getUsername());
+            ps.setString(2, entity.getPassword());
+            ps.setString(3, entity.getRole());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur", e);
@@ -64,12 +65,13 @@ public class UtilisateurDaoImp implements GenericDao<Utilisateur> {
 
     @Override
     public void update(Utilisateur entity) {
-        String sql = "UPDATE utilisateur SET username = ?, password = ? WHERE id = ?";
+        String sql = "UPDATE utilisateur SET username = ?, password = ?, role = ? WHERE id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getEmail());
-            ps.setString(2, entity.getNom());
-            ps.setInt(3, entity.getId());
+            ps.setString(1, entity.getUsername());
+            ps.setString(2, entity.getPassword());
+            ps.setString(3, entity.getRole());
+            ps.setInt(4, entity.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification de l'utilisateur", e);
@@ -91,9 +93,9 @@ public class UtilisateurDaoImp implements GenericDao<Utilisateur> {
     private Utilisateur mapUtilisateur(ResultSet rs) throws SQLException {
         return new Utilisateur(
                 rs.getInt("id"),
+                rs.getString("username"),
                 rs.getString("password"),
-                rs.getString("role"),
-                rs.getString("username")
+                rs.getString("role")
         );
     }
 }
