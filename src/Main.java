@@ -10,12 +10,5 @@ void main() {
         // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
         IO.println("i = " + i);
     }
-    //aaaaaaaaaa
-    //aaaaaaaaaa
-    //aaaaaaaaaa
-    //aaaaaaaaaa
-    //aaaaaaaaaa
 
-    //4545452856985
-    //aaaaaaaaaaaaa
 }
