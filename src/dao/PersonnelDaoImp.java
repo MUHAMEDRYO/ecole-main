@@ -17,10 +17,16 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
     public void add(Personnel entity) {
         String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ADMIN')";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getUsername());
+        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, getUsername(entity));
             ps.setString(2, entity.getPassword());
             ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    entity.setId(rs.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'ajout du personnel", e);
         }
@@ -95,5 +101,12 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
         personnel.setPassword(rs.getString("password"));
         personnel.setRole(rs.getString("role"));
         return personnel;
+    }
+
+    private String getUsername(Personnel entity) {
+        if (entity.getUsername() != null && !entity.getUsername().trim().isEmpty()) {
+            return entity.getUsername();
+        }
+        return entity.getEmail();
     }
 }

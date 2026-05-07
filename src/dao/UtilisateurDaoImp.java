@@ -11,8 +11,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UtilisateurDaoImp implements GenericDao<Utilisateur> {
+
     private final Connection connection = Connexion.getConnection();
 
+
+    public Utilisateur findByLogin(String username, String password) {
+        String sql = "SELECT * FROM utilisateur WHERE username = ? AND password = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUtilisateur(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     @Override
     public void add(Utilisateur entity) {
         String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";

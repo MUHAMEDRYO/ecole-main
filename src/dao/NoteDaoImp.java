@@ -33,7 +33,7 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public Note findById(int id) {
-        String sql = "SELECT * FROM note WHERE id = ?";
+        String sql = getSelectSql() + " WHERE n.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -52,7 +52,7 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public List<Note> findAll() {
-        String sql = "SELECT * FROM note";
+        String sql = getSelectSql();
         List<Note> notes = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -97,11 +97,18 @@ public class NoteDaoImp implements GenericDao<Note> {
     }
 
     private Note mapNote(ResultSet rs) throws SQLException {
-        Etudiant etudiant = new Etudiant();
-        etudiant.setId(rs.getInt("etudiant_id"));
+        Etudiant etudiant = new Etudiant(
+                rs.getInt("etudiant_id"),
+                rs.getString("etudiant_nom"),
+                rs.getString("etudiant_prenom"),
+                rs.getString("etudiant_email")
+        );
 
-        Matiere matiere = new Matiere();
-        matiere.setId(rs.getInt("matiere_id"));
+        Matiere matiere = new Matiere(
+                rs.getInt("matiere_id"),
+                rs.getString("matiere_nom"),
+                null
+        );
 
         return new Note(
                 rs.getInt("id"),
@@ -112,5 +119,14 @@ public class NoteDaoImp implements GenericDao<Note> {
                 matiere,
                 null
         );
+    }
+
+    private String getSelectSql() {
+        return "SELECT n.*, " +
+                "e.nom AS etudiant_nom, e.prenom AS etudiant_prenom, e.email AS etudiant_email, " +
+                "m.nom AS matiere_nom " +
+                "FROM note n " +
+                "JOIN etudiant e ON e.id = n.etudiant_id " +
+                "JOIN matiere m ON m.id = n.matiere_id";
     }
 }

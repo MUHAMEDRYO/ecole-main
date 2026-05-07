@@ -11,14 +11,6 @@ public class Note {
 
     public Note() {}
 
-    public Note(int id, double valeur, Etudiant etudiant, Matiere matiere, Enseignant enseignant) {
-        this.id = id;
-        this.moyenne = valeur;
-        this.etudiant = etudiant;
-        this.matiere = matiere;
-        this.enseignant = enseignant;
-    }
-
     public Note(int id, double noteDs, double noteExamen, double moyenne, Etudiant etudiant, Matiere matiere, Enseignant enseignant) {
         this.id = id;
         this.noteDs = noteDs;
@@ -35,14 +27,6 @@ public class Note {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public double getValeur() {
-        return moyenne;
-    }
-
-    public void setValeur(double valeur) {
-        this.moyenne = valeur;
     }
 
     public double getNoteDs() {
@@ -72,7 +56,7 @@ public class Note {
     }
 
     public void calculerMoyenne() {
-        this.moyenne = (noteDs + noteExamen) / 2;
+        this.moyenne = noteDs *0.3 + noteExamen * 0.7;
     }
 
     public Etudiant getEtudiant() {

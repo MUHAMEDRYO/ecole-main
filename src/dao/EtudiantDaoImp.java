@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,21 +16,54 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
 
     @Override
     public void add(Etudiant entity) {
-        String sql = "INSERT INTO etudiant (nom, prenom, email) VALUES (?, ?, ?)";
+        String utilisateurSql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
+        String etudiantSql = "INSERT INTO etudiant (nom, prenom, email, utilisateur_id) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getNom());
-            ps.setString(2, entity.getPrenom());
-            ps.setString(3, entity.getEmail());
-            ps.executeUpdate();
+        try {
+            connection.setAutoCommit(false);
+
+            int utilisateurId;
+            try (PreparedStatement ps = connection.prepareStatement(utilisateurSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, entity.getEmail());
+                ps.setString(2, entity.getPassword());
+                ps.setString(3, entity.getRole());
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Aucun id utilisateur genere");
+                    }
+                    utilisateurId = rs.getInt(1);
+                }
+            }
+
+            try (PreparedStatement ps = connection.prepareStatement(etudiantSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, entity.getNom());
+                ps.setString(2, entity.getPrenom());
+                ps.setString(3, entity.getEmail());
+                ps.setInt(4, utilisateurId);
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        entity.setId(rs.getInt(1));
+                    }
+                }
+            }
+
+            connection.commit();
         } catch (SQLException e) {
+            rollback();
             throw new RuntimeException("Erreur lors de l'ajout de l'etudiant", e);
+        } finally {
+            restoreAutoCommit();
         }
     }
 
     @Override
     public Etudiant findById(int id) {
-        String sql = "SELECT * FROM etudiant WHERE id = ?";
+        String sql = "SELECT e.*, u.username, u.password, u.role FROM etudiant e " +
+                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id WHERE e.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -48,7 +82,8 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
 
     @Override
     public List<Etudiant> findAll() {
-        String sql = "SELECT * FROM etudiant";
+        String sql = "SELECT e.*, u.username, u.password, u.role FROM etudiant e " +
+                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id";
         List<Etudiant> etudiants = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -65,14 +100,24 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
 
     @Override
     public void update(Etudiant entity) {
-        String sql = "UPDATE etudiant SET nom = ?, prenom = ?, email = ? WHERE id = ?";
+        String etudiantSql = "UPDATE etudiant SET nom = ?, prenom = ?, email = ? WHERE id = ?";
+        String utilisateurSql = "UPDATE utilisateur u JOIN etudiant e ON e.utilisateur_id = u.id " +
+                "SET u.username = ?, u.password = ?, u.role = ? WHERE e.id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(etudiantSql)) {
             ps.setString(1, entity.getNom());
             ps.setString(2, entity.getPrenom());
             ps.setString(3, entity.getEmail());
             ps.setInt(4, entity.getId());
             ps.executeUpdate();
+
+            try (PreparedStatement userPs = connection.prepareStatement(utilisateurSql)) {
+                userPs.setString(1, entity.getEmail());
+                userPs.setString(2, entity.getPassword());
+                userPs.setString(3, entity.getRole());
+                userPs.setInt(4, entity.getId());
+                userPs.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification de l'etudiant", e);
         }
@@ -80,7 +125,7 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM etudiant WHERE id = ?";
+        String sql = "DELETE u, e FROM etudiant e LEFT JOIN utilisateur u ON e.utilisateur_id = u.id WHERE e.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -91,11 +136,38 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
     }
 
     private Etudiant mapEtudiant(ResultSet rs) throws SQLException {
-        return new Etudiant(
+        Etudiant etudiant = new Etudiant(
                 rs.getInt("id"),
                 rs.getString("nom"),
                 rs.getString("prenom"),
                 rs.getString("email")
         );
+        etudiant.setUsername(getStringIfExists(rs, "username", etudiant.getEmail()));
+        etudiant.setPassword(getStringIfExists(rs, "password", null));
+        etudiant.setRole(getStringIfExists(rs, "role", "ETUDIANT"));
+        return etudiant;
+    }
+
+    private String getStringIfExists(ResultSet rs, String column, String defaultValue) {
+        try {
+            String value = rs.getString(column);
+            return value == null ? defaultValue : value;
+        } catch (SQLException e) {
+            return defaultValue;
+        }
+    }
+
+    private void rollback() {
+        try {
+            connection.rollback();
+        } catch (SQLException ignored) {
+        }
+    }
+
+    private void restoreAutoCommit() {
+        try {
+            connection.setAutoCommit(true);
+        } catch (SQLException ignored) {
+        }
     }
 }
