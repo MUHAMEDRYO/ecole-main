@@ -1,10 +1,9 @@
--- 1. Create and use the database
+-- 1. Fassa5 el base ken mawjouda bech n-nadfou kol chay
 DROP DATABASE IF EXISTS school_db;
 CREATE DATABASE school_db;
 USE school_db;
 
--- 2. Table: utilisateur (The core login table)
--- Matched with Utilisateur.java and UtilisateurDaoImp.java
+-- 2. Table: utilisateur (Lazem esmha 'username' kima fil Java)
 CREATE TABLE utilisateur (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -12,8 +11,7 @@ CREATE TABLE utilisateur (
     role ENUM('ADMIN', 'ENSEIGNANT', 'ETUDIANT') NOT NULL
 );
 
--- 3. Table: enseignant (Linked to utilisateur)
--- Matched with EnseignantDaoImp.java
+-- 3. Table: enseignant
 CREATE TABLE enseignant (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -26,8 +24,7 @@ CREATE TABLE enseignant (
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
--- 4. Table: etudiant (Linked to utilisateur)
--- Matched with EtudiantDaoImp.java
+-- 4. Table: etudiant
 CREATE TABLE etudiant (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -38,7 +35,7 @@ CREATE TABLE etudiant (
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
--- 5. Table: personnel (Admins)
+-- 5. Table: personnel (Admin)
 CREATE TABLE personnel (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -55,17 +52,7 @@ CREATE TABLE matiere (
     nom VARCHAR(100) NOT NULL
 );
 
--- 7. Join Table: enseignant_matiere
-CREATE TABLE enseignant_matiere (
-    enseignant_id INT,
-    matiere_id INT,
-    PRIMARY KEY (enseignant_id, matiere_id),
-    FOREIGN KEY (enseignant_id) REFERENCES enseignant(id) ON DELETE CASCADE,
-    FOREIGN KEY (matiere_id) REFERENCES matiere(id) ON DELETE CASCADE
-);
-
--- 8. Table: note
--- Columns matched with Note.java calculation logic
+-- 7. Table: note
 CREATE TABLE note (
     id INT AUTO_INCREMENT PRIMARY KEY,
     note_ds DOUBLE DEFAULT 0,
@@ -79,19 +66,14 @@ CREATE TABLE note (
     FOREIGN KEY (enseignant_id) REFERENCES enseignant(id) ON DELETE SET NULL
 );
 
-
--- 9. INSERT DEFAULT DATA
--- Insert Admin User
+-- 8. Zid el Admin bech t-testi bih
 INSERT INTO utilisateur (username, password, role) 
 VALUES ('admin', 'admin123', 'ADMIN');
 
--- Link Admin User to Personnel table (assuming ID 1)
+-- Erbat el user m3a el personnel (Admin)
 INSERT INTO personnel (nom, prenom, email, utilisateur_id)
 VALUES ('Sassi', 'Ayoub', 'admin@isimg.tn', 1);
 
--- Optional: Insert a test Teacher and Student
-INSERT INTO utilisateur (username, password, role) VALUES ('prof1', 'prof123', 'ENSEIGNANT');
-INSERT INTO enseignant (nom, prenom, email, specialite, utilisateur_id) VALUES ('Hachicha', 'Sofiane', 'sofiane@school.tn', 'Java', 2);
-
-INSERT INTO utilisateur (username, password, role) VALUES ('etu1', 'etu123', 'ETUDIANT');
-INSERT INTO etudiant (nom, prenom, email, utilisateur_id) VALUES ('Ben Ahmed', 'Ali', 'ali@student.tn', 3);
+UPDATE utilisateur 
+SET username = 'ayoub', password = 'a' 
+WHERE id = 1;

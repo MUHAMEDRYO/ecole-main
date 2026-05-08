@@ -22,11 +22,18 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
         try {
             connection.setAutoCommit(false);
 
+            // --- FIX: Thabbet fil password wel role 9bal el insertion ---
+            String password = (entity.getPassword() != null && !entity.getPassword().isEmpty())
+                    ? entity.getPassword() : "123456";
+            String role = (entity.getRole() != null) ? entity.getRole() : "ETUDIANT";
+            String username = (entity.getUsername() != null && !entity.getUsername().isEmpty())
+                    ? entity.getUsername() : entity.getEmail();
+
             int utilisateurId;
             try (PreparedStatement ps = connection.prepareStatement(utilisateurSql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, entity.getEmail());
-                ps.setString(2, entity.getPassword());
-                ps.setString(3, entity.getRole());
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, role);
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -104,12 +111,15 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
         String utilisateurSql = "UPDATE utilisateur u JOIN etudiant e ON e.utilisateur_id = u.id " +
                 "SET u.username = ?, u.password = ?, u.role = ? WHERE e.id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(etudiantSql)) {
-            ps.setString(1, entity.getNom());
-            ps.setString(2, entity.getPrenom());
-            ps.setString(3, entity.getEmail());
-            ps.setInt(4, entity.getId());
-            ps.executeUpdate();
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement ps = connection.prepareStatement(etudiantSql)) {
+                ps.setString(1, entity.getNom());
+                ps.setString(2, entity.getPrenom());
+                ps.setString(3, entity.getEmail());
+                ps.setInt(4, entity.getId());
+                ps.executeUpdate();
+            }
 
             try (PreparedStatement userPs = connection.prepareStatement(utilisateurSql)) {
                 userPs.setString(1, entity.getEmail());
@@ -118,20 +128,37 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
                 userPs.setInt(4, entity.getId());
                 userPs.executeUpdate();
             }
+            connection.commit();
         } catch (SQLException e) {
+            rollback();
             throw new RuntimeException("Erreur lors de la modification de l'etudiant", e);
+        } finally {
+            restoreAutoCommit();
         }
     }
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE u, e FROM etudiant e LEFT JOIN utilisateur u ON e.utilisateur_id = u.id WHERE e.id = ?";
+        // Suppression cascade grâce à la FK dans le SQL, mais on supprime l'utilisateur d'abord
+        String findUserSql = "SELECT utilisateur_id FROM etudiant WHERE id = ?";
+        String deleteUserSql = "DELETE FROM utilisateur WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        try {
+            int userId = -1;
+            try (PreparedStatement ps = connection.prepareStatement(findUserSql)) {
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) userId = rs.getInt("utilisateur_id");
+            }
+
+            if (userId != -1) {
+                try (PreparedStatement ps = connection.prepareStatement(deleteUserSql)) {
+                    ps.setInt(1, userId);
+                    ps.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la suppression de l'etudiant", e);
+            throw new RuntimeException("Erreur lors de la suppression", e);
         }
     }
 
@@ -142,32 +169,21 @@ public class EtudiantDaoImp implements GenericDao<Etudiant> {
                 rs.getString("prenom"),
                 rs.getString("email")
         );
-        etudiant.setUsername(getStringIfExists(rs, "username", etudiant.getEmail()));
-        etudiant.setPassword(getStringIfExists(rs, "password", null));
-        etudiant.setRole(getStringIfExists(rs, "role", "ETUDIANT"));
+        etudiant.setUsername(rs.getString("username"));
+        etudiant.setPassword(rs.getString("password"));
+        etudiant.setRole(rs.getString("role"));
         return etudiant;
-    }
-
-    private String getStringIfExists(ResultSet rs, String column, String defaultValue) {
-        try {
-            String value = rs.getString(column);
-            return value == null ? defaultValue : value;
-        } catch (SQLException e) {
-            return defaultValue;
-        }
     }
 
     private void rollback() {
         try {
             connection.rollback();
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
     }
 
     private void restoreAutoCommit() {
         try {
             connection.setAutoCommit(true);
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
     }
 }
