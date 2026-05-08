@@ -8,6 +8,11 @@ public class Etudiant extends Utilisateur {
     public Etudiant() {
         setRole("ETUDIANT");
     }
+    public Etudiant(String nom, String prenom, String email) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+    }
 
     public Etudiant(int id, String nom, String prenom, String email) {
         setId(id);
