@@ -5,32 +5,38 @@ import model.Utilisateur;
 import javax.swing.*;
 import java.awt.*;
 
+// Hethi el fenétre el kbira elli t-hal ba3d el login
 public class MainDashboard extends JFrame {
-    private JPanel container; // El blasa win bech nbadlou el views
+    private JPanel container; // Hetha el "Cadre" el faragh elli bech n-badlou fih el views
     private AuthController authController;
 
+    // Constructeur sghir
     public MainDashboard(Utilisateur user) {
         this(user, new AuthController());
     }
 
+    // El constructeur el kbir elli yabda fih kol chay
     public MainDashboard(Utilisateur user, AuthController authController) {
         this.authController = authController;
+
+        // Na3tiw title lel fenétre fih el Role wel Username
         setTitle("Tableau de Bord - " + user.getRole() + " (" + user.getUsername() + ")");
         setSize(1000, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout()); // Layout bech n-nadhmou el menu wel west
 
-        // 1. Menu Bar
+        // 1. Menu Bar (El listerat elli mel fouq)
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
-        // --- Menu Admin (Personnel) ---
+        // --- Menu Admin: I-choufou ken el ADMIN ---
         if ("ADMIN".equals(user.getRole())) {
             JMenu menuGestion = new JMenu("Administration");
             JMenuItem itemEtudiants = new JMenuItem("Gérer les Étudiants");
             JMenuItem itemProfs = new JMenuItem("Gérer les Enseignants");
 
+            // Ki nenzel 3la Gérer Etudiants, el view t-tbadel lel panel mte3hom
             itemEtudiants.addActionListener(e -> switchView(new EtudiantManagementPanel()));
             itemProfs.addActionListener(e -> switchView(new EnseignantManagementPanel()));
 
@@ -39,7 +45,7 @@ public class MainDashboard extends JFrame {
             menuBar.add(menuGestion);
         }
 
-        // --- Menu Enseignant ---
+        // --- Menu Enseignant: I-choufou ken el PROF ---
         if ("ENSEIGNANT".equals(user.getRole())) {
             JMenu menuProf = new JMenu("Espace Enseignant");
             JMenuItem itemListe = new JMenuItem("Mes Étudiants");
@@ -53,7 +59,7 @@ public class MainDashboard extends JFrame {
             menuBar.add(menuProf);
         }
 
-        // --- Menu Étudiant ---
+        // --- Menu Étudiant: I-choufou ken el ETUDIANT ---
         if ("ETUDIANT".equals(user.getRole())) {
             JMenu menuEtu = new JMenu("Mon Espace");
             JMenuItem itemMesNotes = new JMenuItem("Consulter mes Notes");
@@ -64,27 +70,28 @@ public class MainDashboard extends JFrame {
             menuBar.add(menuEtu);
         }
 
-        // --- Menu Deconnexion ---
+        // --- Menu Deconnexion: Mawjoud 3and el ness el kol ---
         JMenu menuUser = new JMenu("Compte");
         JMenuItem itemLogout = new JMenuItem("Déconnexion");
         itemLogout.addActionListener(e -> {
-            this.authController.logout();
-            new LoginFrame(this.authController).setVisible(true);
-            this.dispose();
+            this.authController.logout(); // Na7iw el session
+            new LoginFrame(this.authController).setVisible(true); // Narj3ou lel login
+            this.dispose(); // N-sakkrou el Dashboard
         });
         menuUser.add(itemLogout);
         menuBar.add(menuUser);
 
-        // 2. Container Panel (Win n-affichiw el views)
+        // 2. Container Panel (El blasa win n-affichiw el panels)
         container = new JPanel(new BorderLayout());
         container.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Affichage par défaut selon le role
+        // N-7ellou el panel mta3 el bideya 3la 7asb chkoun d5al
         initDefaultView(user);
 
         add(container, BorderLayout.CENTER);
     }
 
+    // Fonction t-ikhtar awel view t-dh'hor 3la 7asb el Role
     private void initDefaultView(Utilisateur user) {
         if ("ADMIN".equals(user.getRole())) {
             switchView(new EtudiantManagementPanel());
@@ -95,10 +102,11 @@ public class MainDashboard extends JFrame {
         }
     }
 
+    // Hethi aham fonction: Hiya elli tfassa5 chnowa maktoub fil west w t-7ot el panel el jdid
     public void switchView(JPanel panel) {
-        container.removeAll();
-        container.add(panel, BorderLayout.CENTER);
-        container.revalidate();
-        container.repaint();
+        container.removeAll(); // Fassa5 el panel el 9dim
+        container.add(panel, BorderLayout.CENTER); // Zid el panel el jdid
+        container.revalidate(); // 3awed 7seb el kobar (refresh)
+        container.repaint();    // 3awed r-som el interface
     }
 }

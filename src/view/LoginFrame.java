@@ -5,7 +5,7 @@ import model.Utilisateur;
 import javax.swing.*;
 import java.awt.*;
 
-// Hethi el fenétre el principal mta3 el login
+
 public class LoginFrame extends JFrame {
     // Naasna3 el blayes win nektbou el username wel password
     private JTextField txtUsername = new JTextField(20);
@@ -24,19 +24,19 @@ public class LoginFrame extends JFrame {
     public LoginFrame(AuthController authController) {
         this.authController = authController;
 
-        // Settings mta3 el fenétre (Title, Size, Position fil west)
+        // Settings mta3 el fenétre (Title, Size, Position )
         setTitle("Système de Gestion d'École - Connexion");
-        setSize(400, 250);
+        setSize(1000, 650);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Nesta3mlou GridBagLayout bech n-nadhmou el les composants s7i7
+        // Nesta3mlou GridBagLayout bech nadhmou el les composants s7i7
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // Espaces bin el les cases
 
         // Zid el kelma "Utilisateur" wel champ mte3ha
-        add(new JLabel("Utilisateur:"), gbc);
+        add(new JLabel("email:"), gbc);
         gbc.gridx = 1; add(txtUsername, gbc);
 
         // Zid el kelma "Mot de passe" wel champ mte3ha (gridy = 1 ya3ni el star elli ba3do)
