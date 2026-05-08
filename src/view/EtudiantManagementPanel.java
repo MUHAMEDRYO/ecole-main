@@ -14,8 +14,10 @@ public class EtudiantManagementPanel extends JPanel {
     private JTextField txtNom = new JTextField(10), txtPrenom = new JTextField(10), txtEmail = new JTextField(15);
 
     public EtudiantManagementPanel() {
+        setOpaque(false);
         setLayout(new BorderLayout());
 
+        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
         // Table
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         tableModel = new DefaultTableModel(columns, 0);

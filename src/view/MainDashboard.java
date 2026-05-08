@@ -1,97 +1,116 @@
 package view;
 
+import com.mysql.cj.Session;
 import controller.AuthController;
 import model.Utilisateur;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
-// Hethi el fenétre el kbira elli t-hal ba3d el login
 public class MainDashboard extends JFrame {
-    private JPanel container; // Hetha el "Cadre" el faragh elli bech n-badlou fih el views
+    private JPanel container;
     private AuthController authController;
+    private Image backgroundImage;
 
-    // Constructeur sghir
     public MainDashboard(Utilisateur user) {
         this(user, new AuthController());
     }
 
-    // El constructeur el kbir elli yabda fih kol chay
     public MainDashboard(Utilisateur user, AuthController authController) {
         this.authController = authController;
 
-        // Na3tiw title lel fenétre fih el Role wel Username
+        // 1. Chargement mta3 el background
+        try {
+            backgroundImage = ImageIO.read(new File("src/img/download.jpeg"));
+        } catch (IOException e) {
+            System.out.println("Erreur: Malqitech el taswira fi src/img/");
+        }
+
         setTitle("Tableau de Bord - " + user.getRole() + " (" + user.getUsername() + ")");
-        setSize(1000, 700);
+        setSize(1100, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout()); // Layout bech n-nadhmou el menu wel west
 
-        // 1. Menu Bar (El listerat elli mel fouq)
+        // 2. Background Panel elli yersem el taswira w fih Overlay
+        JPanel backgroundPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                    // Overlay ghaméq chwaya bech el khedma wel ktiba t-ban wadha
+                    g.setColor(new Color(0, 0, 0, 90));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+        setContentPane(backgroundPanel);
+
+        // 3. Menu Bar Design
         JMenuBar menuBar = new JMenuBar();
+        menuBar.setBackground(new Color(33, 37, 41)); // Dark color professional
+        UIManager.put("Menu.foreground", Color.BLACK);
         setJMenuBar(menuBar);
 
-        // --- Menu Admin: I-choufou ken el ADMIN ---
+        // --- Setup Menus ---
+        setupMenus(user, menuBar);
+
+        // 4. Container Panel: Hetha elli bech i-hiz el Tables
+        // Nesta3mlou GridBagLayout hna bech n-najmou n-centeriw el khedma
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setOpaque(false); // Transparent bech n-choufou el background
+
+        container = new JPanel(new BorderLayout());
+        container.setOpaque(false);
+
+        // Zidna EmptyBorder kbir lel container bech el Tables ma-yaklouch el blasa lkol
+        container.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // N-centeriw el container west el wrapper
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        wrapper.add(container, gbc);
+
+        initDefaultView(user);
+        backgroundPanel.add(wrapper, BorderLayout.CENTER);
+    }
+
+    private void setupMenus(Utilisateur user, JMenuBar menuBar) {
         if ("ADMIN".equals(user.getRole())) {
             JMenu menuGestion = new JMenu("Administration");
             JMenuItem itemEtudiants = new JMenuItem("Gérer les Étudiants");
             JMenuItem itemProfs = new JMenuItem("Gérer les Enseignants");
-
-            // Ki nenzel 3la Gérer Etudiants, el view t-tbadel lel panel mte3hom
             itemEtudiants.addActionListener(e -> switchView(new EtudiantManagementPanel()));
             itemProfs.addActionListener(e -> switchView(new EnseignantManagementPanel()));
-
-            menuGestion.add(itemEtudiants);
-            menuGestion.add(itemProfs);
+            menuGestion.add(itemEtudiants); menuGestion.add(itemProfs);
             menuBar.add(menuGestion);
         }
 
-        // --- Menu Enseignant: I-choufou ken el PROF ---
         if ("ENSEIGNANT".equals(user.getRole())) {
             JMenu menuProf = new JMenu("Espace Enseignant");
-            JMenuItem itemListe = new JMenuItem("Mes Étudiants");
-            JMenuItem itemNotes = new JMenuItem("Saisir les Notes");
-
-            itemListe.addActionListener(e -> switchView(new EnseignantView(user)));
+            JMenuItem itemNotes = new JMenuItem("Gestion des Notes");
             itemNotes.addActionListener(e -> switchView(new NoteManagementPanel()));
-
-            menuProf.add(itemListe);
             menuProf.add(itemNotes);
             menuBar.add(menuProf);
         }
 
-        // --- Menu Étudiant: I-choufou ken el ETUDIANT ---
-        if ("ETUDIANT".equals(user.getRole())) {
-            JMenu menuEtu = new JMenu("Mon Espace");
-            JMenuItem itemMesNotes = new JMenuItem("Consulter mes Notes");
-
-            itemMesNotes.addActionListener(e -> switchView(new EtudiantView(user)));
-
-            menuEtu.add(itemMesNotes);
-            menuBar.add(menuEtu);
-        }
-
-        // --- Menu Deconnexion: Mawjoud 3and el ness el kol ---
-        JMenu menuUser = new JMenu("Compte");
+        JMenu menuUser = new JMenu("Account");
         JMenuItem itemLogout = new JMenuItem("Déconnexion");
         itemLogout.addActionListener(e -> {
-            this.authController.logout(); // Na7iw el session
-            new LoginFrame(this.authController).setVisible(true); // Narj3ou lel login
-            this.dispose(); // N-sakkrou el Dashboard
+            this.authController.logout();
+            new LoginFrame(this.authController).setVisible(true);
+            this.dispose();
         });
         menuUser.add(itemLogout);
         menuBar.add(menuUser);
-
-        // 2. Container Panel (El blasa win n-affichiw el panels)
-        container = new JPanel(new BorderLayout());
-        container.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        // N-7ellou el panel mta3 el bideya 3la 7asb chkoun d5al
-        initDefaultView(user);
-
-        add(container, BorderLayout.CENTER);
     }
 
-    // Fonction t-ikhtar awel view t-dh'hor 3la 7asb el Role
     private void initDefaultView(Utilisateur user) {
         if ("ADMIN".equals(user.getRole())) {
             switchView(new EtudiantManagementPanel());
@@ -102,11 +121,12 @@ public class MainDashboard extends JFrame {
         }
     }
 
-    // Hethi aham fonction: Hiya elli tfassa5 chnowa maktoub fil west w t-7ot el panel el jdid
     public void switchView(JPanel panel) {
-        container.removeAll(); // Fassa5 el panel el 9dim
-        container.add(panel, BorderLayout.CENTER); // Zid el panel el jdid
-        container.revalidate(); // 3awed 7seb el kobar (refresh)
-        container.repaint();    // 3awed r-som el interface
+        // Kol panel n-7ottouh lazem i-koun transparent
+        panel.setOpaque(false);
+        container.removeAll();
+        container.add(panel, BorderLayout.CENTER);
+        container.revalidate();
+        container.repaint();
     }
 }

@@ -26,7 +26,7 @@ public class NoteManagementPanel extends JPanel {
 
     public NoteManagementPanel() {
         setLayout(new BorderLayout());
-
+        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
         // 1. Form Panel (Inputs)
         JPanel formPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         formPanel.setBorder(BorderFactory.createTitledBorder("Saisie des Notes"));

@@ -22,6 +22,8 @@ public class EnseignantManagementPanel extends JPanel {
     public EnseignantManagementPanel() {
         setLayout(new BorderLayout());
 
+        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
+
         // 1. Table Setup
         String[] columns = {"ID", "Nom", "Prénom", "Email", "Grade", "Spécialité"};
         tableModel = new DefaultTableModel(columns, 0);

@@ -4,69 +4,109 @@ import controller.AuthController;
 import model.Utilisateur;
 import javax.swing.*;
 import java.awt.*;
-
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 public class LoginFrame extends JFrame {
-    // Naasna3 el blayes win nektbou el username wel password
+    // 1. Raddina el fields "Medium" (20 blasset 30)
     private JTextField txtUsername = new JTextField(20);
     private JPasswordField txtPassword = new JPasswordField(20);
-    // Bouton el connexion
-    private JButton btnLogin = new JButton("Connexion");
-    // Na3rfou el controller elli bech ythabbet fel base de données
+    private JButton btnLogin = new JButton("SE CONNECTER");
     private AuthController authController;
+    private Image backgroundImage;
 
-    // Constructeur par défaut
     public LoginFrame() {
         this(new AuthController());
     }
 
-    // Constructeur elli yebni el interface
     public LoginFrame(AuthController authController) {
         this.authController = authController;
 
-        // Settings mta3 el fenétre (Title, Size, Position )
-        setTitle("Système de Gestion d'École - Connexion");
-        setSize(1000, 650);
+        try {
+            backgroundImage = ImageIO.read(new File("src/img/back1.jpeg"));
+        } catch (IOException e) {
+            System.out.println("Erreur: Malqitech el taswira fi src/img/");
+        }
+
+        JPanel mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                    // Narssmou el background
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+
+                    // 2. Overlay transparent (mouch abyadh) bech el background yabqa dhahir
+                    g.setColor(new Color(0, 0, 0, 80));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+
+        setTitle("-Gestion d'ecole-");
+        setSize(900, 600); // 7ajm medium lel fenetre
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Nesta3mlou GridBagLayout bech nadhmou el les composants s7i7
-        setLayout(new GridBagLayout());
+        mainPanel.setLayout(new GridBagLayout());
+        setContentPane(mainPanel);
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Espaces bin el les cases
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Zid el kelma "Utilisateur" wel champ mte3ha
-        add(new JLabel("email:"), gbc);
-        gbc.gridx = 1; add(txtUsername, gbc);
+        Font labelFont = new Font("Segoe UI", Font.BOLD, 16);
+        Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
 
-        // Zid el kelma "Mot de passe" wel champ mte3ha (gridy = 1 ya3ni el star elli ba3do)
-        gbc.gridx = 1; gbc.gridy = 1; add(new JLabel("Mot de passe:"), gbc);
-        gbc.gridx = 1; add(txtPassword, gbc);
+        // --- Email Section ---
+        JLabel lblUser = new JLabel("Email :");
+        lblUser.setFont(labelFont);
+        lblUser.setForeground(Color.WHITE); // Ktiba bidha bech tban fil background
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        add(lblUser, gbc);
 
-        // Zid el bouton mta3 el login f-e5er star
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        txtUsername.setFont(fieldFont);
+        txtUsername.setPreferredSize(new Dimension(300, 35)); // 3. Taille Medium
+        gbc.gridy = 1;
+        add(txtUsername, gbc);
+
+        // --- Password Section ---
+        JLabel lblPass = new JLabel("Mot de passe:");
+        lblPass.setFont(labelFont);
+        lblPass.setForeground(Color.WHITE);
+        gbc.gridy = 2;
+        add(lblPass, gbc);
+
+        txtPassword.setFont(fieldFont);
+        txtPassword.setPreferredSize(new Dimension(300, 35)); // 3. Taille Medium
+        gbc.gridy = 3;
+        add(txtPassword, gbc);
+
+        // --- Button Section ---
+        btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        // 4. Connecter maktouba bel akhel w bouton design
+        btnLogin.setBackground(Color.WHITE);
+        btnLogin.setForeground(Color.BLACK);
+        btnLogin.setFocusPainted(false);
+        btnLogin.setPreferredSize(new Dimension(150, 40));
+
+        gbc.gridy = 4;
+        gbc.insets = new Insets(25, 10, 10, 10);
         add(btnLogin, gbc);
 
-        // Ki tenzel 3la el bouton, nadelna el fonction "handleLogin"
         btnLogin.addActionListener(e -> handleLogin());
     }
 
-
     private void handleLogin() {
-        // Ne5dou el maktoub f-el interface
         String user = txtUsername.getText();
         String pass = new String(txtPassword.getPassword());
-
-        // Nab3thouhom lel controller bech yel9ahom fel database
         Utilisateur loggedUser = authController.login(user, pass);
 
-        // Itha l9ah (ma3naha mouch null)
         if (loggedUser != null) {
-            this.dispose(); // Sakker el fenétre mta3 el login
-            // 7el el Dashboard el kbir w 3tih el utilisateur elli d5al
+            this.dispose();
             new MainDashboard(loggedUser, authController).setVisible(true);
         } else {
-            // Itha l-id wala el pass ghalta, talle3 message d'erreur
             JOptionPane.showMessageDialog(this, "Identifiants incorrects", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
