@@ -40,7 +40,7 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 1; add(txtUsername, gbc);
 
         // Zid el kelma "Mot de passe" wel champ mte3ha (gridy = 1 ya3ni el star elli ba3do)
-        gbc.gridx = 0; gbc.gridy = 1; add(new JLabel("Mot de passe:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; add(new JLabel("Mot de passe:"), gbc);
         gbc.gridx = 1; add(txtPassword, gbc);
 
         // Zid el bouton mta3 el login f-e5er star
@@ -51,7 +51,7 @@ public class LoginFrame extends JFrame {
         btnLogin.addActionListener(e -> handleLogin());
     }
 
-    // El fonction elli tthabbet f-el utilisateur
+
     private void handleLogin() {
         // Ne5dou el maktoub f-el interface
         String user = txtUsername.getText();
