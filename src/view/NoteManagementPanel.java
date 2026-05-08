@@ -71,6 +71,11 @@ public class NoteManagementPanel extends JPanel {
                 Etudiant selectedEtu = (Etudiant) cbEtudiants.getSelectedItem();
                 Matiere selectedMat = (Matiere) cbMatieres.getSelectedItem();
 
+                if (selectedEtu == null || selectedMat == null) {
+                    JOptionPane.showMessageDialog(this, "Veuillez choisir un etudiant et une matiere.");
+                    return;
+                }
+
                 Object[] row = {"", selectedEtu.getNom(), selectedMat.getNom(), ds, exam, String.format("%.2f", moy)};
                 tableModel.addRow(row);
             } catch (NumberFormatException ex) {
@@ -81,9 +86,17 @@ public class NoteManagementPanel extends JPanel {
         // Button: Enregistrer (Database Sync)
         btnSave.addActionListener(e -> {
             try {
+                Etudiant selectedEtu = (Etudiant) cbEtudiants.getSelectedItem();
+                Matiere selectedMat = (Matiere) cbMatieres.getSelectedItem();
+
+                if (selectedEtu == null || selectedMat == null) {
+                    JOptionPane.showMessageDialog(this, "Veuillez choisir un etudiant et une matiere.");
+                    return;
+                }
+
                 Note n = new Note();
-                n.setEtudiant((Etudiant) cbEtudiants.getSelectedItem());
-                n.setMatiere((Matiere) cbMatieres.getSelectedItem());
+                n.setEtudiant(selectedEtu);
+                n.setMatiere(selectedMat);
                 n.setNoteDs(Double.parseDouble(txtNoteDS.getText()));
                 n.setNoteExamen(Double.parseDouble(txtNoteExamen.getText()));
 
@@ -98,7 +111,9 @@ public class NoteManagementPanel extends JPanel {
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
-                tableModel.removeRow(row);
+                int id = (int) tableModel.getValueAt(row, 0);
+                noteController.deleteNote(id);
+                loadNotesTable();
             }
         });
     }

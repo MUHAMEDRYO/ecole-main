@@ -1,13 +1,20 @@
 package view;
 
+import controller.AuthController;
 import model.Utilisateur;
 import javax.swing.*;
 import java.awt.*;
 
 public class MainDashboard extends JFrame {
     private JPanel container; // El blasa win bech nbadlou el views
+    private AuthController authController;
 
     public MainDashboard(Utilisateur user) {
+        this(user, new AuthController());
+    }
+
+    public MainDashboard(Utilisateur user, AuthController authController) {
+        this.authController = authController;
         setTitle("Tableau de Bord - " + user.getRole() + " (" + user.getUsername() + ")");
         setSize(1000, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -25,7 +32,7 @@ public class MainDashboard extends JFrame {
             JMenuItem itemProfs = new JMenuItem("Gérer les Enseignants");
 
             itemEtudiants.addActionListener(e -> switchView(new EtudiantManagementPanel()));
-            // Itha 3andek EnseignantManagementPanel, zidou hna
+            itemProfs.addActionListener(e -> switchView(new EnseignantManagementPanel()));
 
             menuGestion.add(itemEtudiants);
             menuGestion.add(itemProfs);
@@ -61,7 +68,8 @@ public class MainDashboard extends JFrame {
         JMenu menuUser = new JMenu("Compte");
         JMenuItem itemLogout = new JMenuItem("Déconnexion");
         itemLogout.addActionListener(e -> {
-            new LoginFrame().setVisible(true);
+            this.authController.logout();
+            new LoginFrame(this.authController).setVisible(true);
             this.dispose();
         });
         menuUser.add(itemLogout);

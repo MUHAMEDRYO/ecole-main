@@ -9,9 +9,14 @@ public class LoginFrame extends JFrame {
     private JTextField txtUsername = new JTextField(20);
     private JPasswordField txtPassword = new JPasswordField(20);
     private JButton btnLogin = new JButton("Connexion");
-    private AuthController authController = new AuthController();
+    private AuthController authController;
 
     public LoginFrame() {
+        this(new AuthController());
+    }
+
+    public LoginFrame(AuthController authController) {
+        this.authController = authController;
         setTitle("Système de Gestion d'École - Connexion");
         setSize(400, 250);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -40,7 +45,7 @@ public class LoginFrame extends JFrame {
 
         if (loggedUser != null) {
             this.dispose();
-            new MainDashboard(loggedUser).setVisible(true);
+            new MainDashboard(loggedUser, authController).setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Identifiants incorrects", "Erreur", JOptionPane.ERROR_MESSAGE);
         }

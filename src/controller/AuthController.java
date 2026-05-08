@@ -5,6 +5,7 @@ import model.Utilisateur;
 
 public class AuthController {
     private final UtilisateurDaoImp dao = new UtilisateurDaoImp(); //final 5ater lazem n5dmou bnafs connection no93douch nbadlou feha
+    private Utilisateur currentUser;
 
     public Utilisateur login(String username, String password) {
         if (username == null || username.trim().isEmpty() ||
@@ -15,7 +16,15 @@ public class AuthController {
     }
 
     public void logout() {
-        // Later, clear the current session/user here if you store one.
+        currentUser = null;
+    }
+
+    public Utilisateur getCurrentUser() {
+        return currentUser;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
     }
 
     public String navigate(Utilisateur user) {

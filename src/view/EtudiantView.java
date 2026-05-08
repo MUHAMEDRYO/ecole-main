@@ -12,8 +12,10 @@ public class EtudiantView extends JPanel {
     private NoteController noteController = new NoteController();
     private JTable tableNotes;
     private DefaultTableModel modelNotes;
+    private final Utilisateur currentEtudiant;
 
     public EtudiantView(Utilisateur etudiant) {
+        this.currentEtudiant = etudiant;
         setLayout(new BorderLayout());
 
         // Header
@@ -32,9 +34,11 @@ public class EtudiantView extends JPanel {
 
     private void loadMyNotes() {
         modelNotes.setRowCount(0);
-        // Hna nfarjou el noutat l-kol (f-el projet sghir)
         List<Note> notes = noteController.findAllNotes();
         for (Note n : notes) {
+            if (n.getEtudiant() == null || currentEtudiant.getUsername() == null || !currentEtudiant.getUsername().equals(n.getEtudiant().getUsername())) {
+                continue;
+            }
             modelNotes.addRow(new Object[]{
                     n.getMatiere().getNom(),
                     n.getNoteDs(),

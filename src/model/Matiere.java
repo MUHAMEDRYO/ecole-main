@@ -39,6 +39,9 @@ public class Matiere {
 
     @Override
     public String toString() {
-        return "Matiere: " + nom + " (Prof: " + enseignant.getNom() + ")";
+        if (enseignant == null || enseignant.getNom() == null || enseignant.getNom().trim().isEmpty()) {
+            return nom;
+        }
+        return nom + " (" + enseignant.getNom() + ")";
     }
 }

@@ -17,7 +17,7 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public void add(Note entity) {
-        String sql = "INSERT INTO note (etudiant_id, matiere_id, note_ds, note_exam, note_finale) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO note (etudiant_id, matiere_id, note_ds, note_examen, moyenne) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, entity.getEtudiant().getId());
@@ -69,7 +69,7 @@ public class NoteDaoImp implements GenericDao<Note> {
 
     @Override
     public void update(Note entity) {
-        String sql = "UPDATE note SET etudiant_id = ?, matiere_id = ?, note_ds = ?, note_exam = ?, note_finale = ? WHERE id = ?";
+        String sql = "UPDATE note SET etudiant_id = ?, matiere_id = ?, note_ds = ?, note_examen = ?, moyenne = ? WHERE id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, entity.getEtudiant().getId());
@@ -113,8 +113,8 @@ public class NoteDaoImp implements GenericDao<Note> {
         return new Note(
                 rs.getInt("id"),
                 rs.getDouble("note_ds"),
-                rs.getDouble("note_exam"),
-                rs.getDouble("note_finale"),
+                rs.getDouble("note_examen"),
+                rs.getDouble("moyenne"),
                 etudiant,
                 matiere,
                 null

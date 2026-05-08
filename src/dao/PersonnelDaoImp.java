@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,26 +16,54 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
 
     @Override
     public void add(Personnel entity) {
-        String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ADMIN')";
+        String utilisateurSql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ADMIN')";
+        String personnelSql = "INSERT INTO personnel (nom, prenom, email, utilisateur_id) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, getUsername(entity));
-            ps.setString(2, entity.getPassword());
-            ps.executeUpdate();
+        try {
+            connection.setAutoCommit(false);
 
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    entity.setId(rs.getInt(1));
+            int utilisateurId;
+            try (PreparedStatement ps = connection.prepareStatement(utilisateurSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, getUsername(entity));
+                ps.setString(2, entity.getPassword());
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Aucun id utilisateur genere");
+                    }
+                    utilisateurId = rs.getInt(1);
                 }
             }
+
+            try (PreparedStatement ps = connection.prepareStatement(personnelSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, entity.getNom());
+                ps.setString(2, entity.getPrenom());
+                ps.setString(3, entity.getEmail());
+                ps.setInt(4, utilisateurId);
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        entity.setId(rs.getInt(1));
+                    }
+                }
+            }
+
+            connection.commit();
         } catch (SQLException e) {
+            rollback();
             throw new RuntimeException("Erreur lors de l'ajout du personnel", e);
+        } finally {
+            restoreAutoCommit();
         }
     }
 
     @Override
     public Personnel findById(int id) {
-        String sql = "SELECT * FROM utilisateur WHERE id = ? AND role = 'ADMIN'";
+        String sql = "SELECT p.*, u.username, u.password, u.role " +
+                "FROM personnel p LEFT JOIN utilisateur u ON p.utilisateur_id = u.id " +
+                "WHERE p.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -53,7 +82,8 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
 
     @Override
     public List<Personnel> findAll() {
-        String sql = "SELECT * FROM utilisateur WHERE role = 'ADMIN'";
+        String sql = "SELECT p.*, u.username, u.password, u.role " +
+                "FROM personnel p LEFT JOIN utilisateur u ON p.utilisateur_id = u.id";
         List<Personnel> personnels = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -70,13 +100,23 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
 
     @Override
     public void update(Personnel entity) {
-        String sql = "UPDATE utilisateur SET username = ?, password = ? WHERE id = ? AND role = 'ADMIN'";
+        String personnelSql = "UPDATE personnel SET nom = ?, prenom = ?, email = ? WHERE id = ?";
+        String utilisateurSql = "UPDATE utilisateur u JOIN personnel p ON p.utilisateur_id = u.id " +
+                "SET u.username = ?, u.password = ? WHERE p.id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, entity.getUsername());
-            ps.setString(2, entity.getPassword());
-            ps.setInt(3, entity.getId());
+        try (PreparedStatement ps = connection.prepareStatement(personnelSql)) {
+            ps.setString(1, entity.getNom());
+            ps.setString(2, entity.getPrenom());
+            ps.setString(3, entity.getEmail());
+            ps.setInt(4, entity.getId());
             ps.executeUpdate();
+
+            try (PreparedStatement userPs = connection.prepareStatement(utilisateurSql)) {
+                userPs.setString(1, getUsername(entity));
+                userPs.setString(2, entity.getPassword());
+                userPs.setInt(3, entity.getId());
+                userPs.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification du personnel", e);
         }
@@ -84,7 +124,7 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM utilisateur WHERE id = ? AND role = 'ADMIN'";
+        String sql = "DELETE u, p FROM personnel p LEFT JOIN utilisateur u ON p.utilisateur_id = u.id WHERE p.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -97,6 +137,9 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
     private Personnel mapPersonnel(ResultSet rs) throws SQLException {
         Personnel personnel = new Personnel();
         personnel.setId(rs.getInt("id"));
+        personnel.setNom(rs.getString("nom"));
+        personnel.setPrenom(rs.getString("prenom"));
+        personnel.setEmail(rs.getString("email"));
         personnel.setUsername(rs.getString("username"));
         personnel.setPassword(rs.getString("password"));
         personnel.setRole(rs.getString("role"));
@@ -108,5 +151,19 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
             return entity.getUsername();
         }
         return entity.getEmail();
+    }
+
+    private void rollback() {
+        try {
+            connection.rollback();
+        } catch (SQLException ignored) {
+        }
+    }
+
+    private void restoreAutoCommit() {
+        try {
+            connection.setAutoCommit(true);
+        } catch (SQLException ignored) {
+        }
     }
 }
