@@ -1,33 +1,34 @@
--- Create the database
-CREATE DATABASE IF NOT EXISTS school_db;
-USE ecole; 
+-- 1. Create and use the database
+DROP DATABASE IF EXISTS school_db;
+CREATE DATABASE school_db;
+USE school_db;
 
--- 1. Table: utilisateur
--- Based on Utilisateur.java and login logic in AuthController
-CREATE TABLE IF NOT EXISTS utilisateur (
+-- 2. Table: utilisateur (The core login table)
+-- Matched with Utilisateur.java and UtilisateurDaoImp.java
+CREATE TABLE utilisateur (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('ADMIN', 'ENSEIGNANT', 'ETUDIANT') NOT NULL
 );
 
--- 2. Table: enseignant
--- Based on Enseignant.java and EnseignantDaoImp.java
-CREATE TABLE IF NOT EXISTS enseignant (
+-- 3. Table: enseignant (Linked to utilisateur)
+-- Matched with EnseignantDaoImp.java
+CREATE TABLE enseignant (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     grade VARCHAR(50),
-    specialite VARCHAR(100), -- Used in mapEnseignant method
+    specialite VARCHAR(100),
     utilisateur_id INT,
     CONSTRAINT fk_enseignant_user FOREIGN KEY (utilisateur_id) 
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
--- 3. Table: etudiant
--- Based on Etudiant.java and EtudiantDaoImp.java
-CREATE TABLE IF NOT EXISTS etudiant (
+-- 4. Table: etudiant (Linked to utilisateur)
+-- Matched with EtudiantDaoImp.java
+CREATE TABLE etudiant (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
@@ -37,9 +38,8 @@ CREATE TABLE IF NOT EXISTS etudiant (
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
--- 4. Table: personnel (Admin members)
--- Based on Personnel.java
-CREATE TABLE IF NOT EXISTS personnel (
+-- 5. Table: personnel (Admins)
+CREATE TABLE personnel (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
@@ -49,16 +49,14 @@ CREATE TABLE IF NOT EXISTS personnel (
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
--- 5. Table: matiere
--- Based on Matiere.java and MatiereDaoImp.java
-CREATE TABLE IF NOT EXISTS matiere (
+-- 6. Table: matiere
+CREATE TABLE matiere (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL
 );
 
--- 6. Join Table: enseignant_matiere
--- Found in MatiereDaoImp.java logic (saveEnseignantMatiere)
-CREATE TABLE IF NOT EXISTS enseignant_matiere (
+-- 7. Join Table: enseignant_matiere
+CREATE TABLE enseignant_matiere (
     enseignant_id INT,
     matiere_id INT,
     PRIMARY KEY (enseignant_id, matiere_id),
@@ -66,9 +64,9 @@ CREATE TABLE IF NOT EXISTS enseignant_matiere (
     FOREIGN KEY (matiere_id) REFERENCES matiere(id) ON DELETE CASCADE
 );
 
--- 7. Table: note
--- Based on Note.java and NoteController.java
-CREATE TABLE IF NOT EXISTS note (
+-- 8. Table: note
+-- Columns matched with Note.java calculation logic
+CREATE TABLE note (
     id INT AUTO_INCREMENT PRIMARY KEY,
     note_ds DOUBLE DEFAULT 0,
     note_examen DOUBLE DEFAULT 0,
@@ -81,6 +79,19 @@ CREATE TABLE IF NOT EXISTS note (
     FOREIGN KEY (enseignant_id) REFERENCES enseignant(id) ON DELETE SET NULL
 );
 
--- Initial Data for Testing
-INSERT IGNORE INTO utilisateur (username, password, role) VALUES 
-('admin', 'a', 'ADMIN');
+
+-- 9. INSERT DEFAULT DATA
+-- Insert Admin User
+INSERT INTO utilisateur (username, password, role) 
+VALUES ('admin', 'admin123', 'ADMIN');
+
+-- Link Admin User to Personnel table (assuming ID 1)
+INSERT INTO personnel (nom, prenom, email, utilisateur_id)
+VALUES ('Sassi', 'Ayoub', 'admin@isimg.tn', 1);
+
+-- Optional: Insert a test Teacher and Student
+INSERT INTO utilisateur (username, password, role) VALUES ('prof1', 'prof123', 'ENSEIGNANT');
+INSERT INTO enseignant (nom, prenom, email, specialite, utilisateur_id) VALUES ('Hachicha', 'Sofiane', 'sofiane@school.tn', 'Java', 2);
+
+INSERT INTO utilisateur (username, password, role) VALUES ('etu1', 'etu123', 'ETUDIANT');
+INSERT INTO etudiant (nom, prenom, email, utilisateur_id) VALUES ('Ben Ahmed', 'Ali', 'ali@student.tn', 3);
