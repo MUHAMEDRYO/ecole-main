@@ -16,24 +16,45 @@ public class EnseignantView extends JPanel {
     private JTable tableEtudiants;
     private DefaultTableModel modelEtudiants;
 
+    private JMenuItem itemLogout = new JMenuItem("Déconnexion");
+    private JMenuItem langFr = new JMenuItem("Français");
+    private JMenuItem langEn = new JMenuItem("English");
+    private JMenuItem langAr = new JMenuItem("العربية");
+
     private CardLayout cardLayout = new CardLayout();
     private JPanel cards = new JPanel(cardLayout);
 
-    public EnseignantView(Utilisateur prof, JFrame parentFrame) {
+    // Changed parentFrame to MainDashboard to access its methods
+    public EnseignantView(Utilisateur prof, MainDashboard dashboard) {
         setLayout(new BorderLayout());
 
-        // --- CREATING THE MENU BAR (Beside Compte/Language) ---
+        // --- MENU BAR ---
         JMenuBar menuBar = new JMenuBar();
-
-        // Navigation Menus
         JMenu menuGérer = new JMenu("Gérer les Notes");
         JMenu menuEspace = new JMenu("Espace Enseignant");
 
-        // Keeping your existing items (simulated here)
+        // Compte Menu
         JMenu menuCompte = new JMenu("Compte");
-        JMenu menuLanguage = new JMenu("Language");
+        menuCompte.add(itemLogout);
 
-        // Add Click listeners to the Menu Titles
+        // ACTION: LOGOUT
+        itemLogout.addActionListener(e -> {
+            dashboard.dispose(); // Close current dashboard
+            // Assuming LoginFrame takes an AuthController or similar
+            new LoginFrame(new controller.AuthController()).setVisible(true);
+        });
+
+        // Language Menu
+        JMenu menuLanguage = new JMenu("Language");
+        menuLanguage.add(langFr);
+        menuLanguage.add(langEn);
+        menuLanguage.add(langAr);
+
+        // ACTIONS: LANGUAGE SWITCHING
+        langFr.addActionListener(e -> translateUI("FR", menuGérer, menuEspace, menuCompte));
+        langEn.addActionListener(e -> translateUI("EN", menuGérer, menuEspace, menuCompte));
+        langAr.addActionListener(e -> translateUI("AR", menuGérer, menuEspace, menuCompte));
+
         menuGérer.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 cardLayout.show(cards, "NOTES");
@@ -51,10 +72,9 @@ public class EnseignantView extends JPanel {
         menuBar.add(menuCompte);
         menuBar.add(menuLanguage);
 
-        // Attach the menu bar to the parent JFrame
-        parentFrame.setJMenuBar(menuBar);
+        dashboard.setJMenuBar(menuBar);
 
-        // --- CONTENT CARDS ---
+        // --- CONTENT ---
         JPanel notesPanel = createNotesPanel();
         JPanel profPanel = createProfPanel(prof);
 
@@ -63,16 +83,32 @@ public class EnseignantView extends JPanel {
         add(cards, BorderLayout.CENTER);
     }
 
+    private void translateUI(String lang, JMenu m1, JMenu m2, JMenu m3) {
+        if (lang.equals("FR")) {
+            m1.setText("Gérer les Notes");
+            m2.setText("Espace Enseignant");
+            m3.setText("Compte");
+            itemLogout.setText("Déconnexion");
+        } else if (lang.equals("EN")) {
+            m1.setText("Manage Grades");
+            m2.setText("Teacher Space");
+            m3.setText("Account");
+            itemLogout.setText("Logout");
+        } else if (lang.equals("AR")) {
+            m1.setText("إدارة الأعداد");
+            m2.setText("فضاء الأستاذ");
+            m3.setText("الحساب");
+            itemLogout.setText("تسجيل الخروج");
+        }
+    }
+
     private JPanel createNotesPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        // Table Etudiants
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         modelEtudiants = new DefaultTableModel(columns, 0);
         tableEtudiants = new JTable(modelEtudiants);
         loadEtudiants();
 
-        // Clicking a student allows manipulating properties (Note DS, etc.)
         tableEtudiants.getSelectionModel().addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting() && tableEtudiants.getSelectedRow() != -1) {
                 openEditNotesDialog(tableEtudiants.getSelectedRow());
@@ -81,46 +117,33 @@ public class EnseignantView extends JPanel {
 
         panel.add(new JScrollPane(tableEtudiants), BorderLayout.CENTER);
         panel.setBorder(BorderFactory.createTitledBorder("Liste des Étudiants"));
-
         return panel;
     }
 
     private JPanel createProfPanel(Utilisateur prof) {
-        JPanel panel = new JPanel(new GridBagLayout()); // Centered layout
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-
         panel.add(new JLabel("Nom d'utilisateur: " + prof.getUsername()), gbc);
         gbc.gridy++;
         panel.add(new JLabel("Rôle: " + prof.getRole()), gbc);
-
         return panel;
     }
 
     private void openEditNotesDialog(int row) {
         String nom = modelEtudiants.getValueAt(row, 1).toString();
-
         JPanel dialogPanel = new JPanel(new GridLayout(0, 2, 10, 10));
         JTextField txtDS = new JTextField();
         JTextField txtExam = new JTextField();
-
         dialogPanel.add(new JLabel("Étudiant:"));
         dialogPanel.add(new JLabel(nom));
         dialogPanel.add(new JLabel("Note DS:"));
         dialogPanel.add(txtDS);
         dialogPanel.add(new JLabel("Note Examen:"));
         dialogPanel.add(txtExam);
-
-        int result = JOptionPane.showConfirmDialog(null, dialogPanel,
-                "Saisie des Notes", JOptionPane.OK_CANCEL_OPTION);
-
-        if (result == JOptionPane.OK_OPTION) {
-            // Logic to update student notes via your controllers
-            System.out.println("Updating " + nom + " with DS: " + txtDS.getText());
-        }
+        JOptionPane.showConfirmDialog(null, dialogPanel, "Saisie des Notes", JOptionPane.OK_CANCEL_OPTION);
     }
 
     private void loadEtudiants() {
