@@ -1,6 +1,5 @@
 package view;
 
-import com.mysql.cj.Session;
 import controller.AuthController;
 import model.Utilisateur;
 import javax.imageio.ImageIO;
@@ -8,39 +7,45 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainDashboard extends JFrame {
     private JPanel container;
     private AuthController authController;
     private Image backgroundImage;
+    private Utilisateur currentUser;
+
+    // UI Elements that need translation
+    private JMenu menuGestion, menuProf, menuUser, menuLanguage;
+    private JMenuItem itemEtudiants, itemProfs, itemPers, itemNotes, itemLogout;
+    private JMenuItem langFr, langEn, langAr;
 
     public MainDashboard(Utilisateur user) {
         this(user, new AuthController());
     }
 
     public MainDashboard(Utilisateur user, AuthController authController) {
+        this.currentUser = user;
         this.authController = authController;
 
-        // 1. Chargement mta3 el background
         try {
             backgroundImage = ImageIO.read(new File("src/img/download.jpeg"));
         } catch (IOException e) {
             System.out.println("Erreur: Malqitech el taswira fi src/img/");
         }
 
-        setTitle("Tableau de Bord - " + user.getRole() + " (" + user.getUsername() + ")");
+        updateTitle("FR");
         setSize(1100, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // 2. Background Panel elli yersem el taswira w fih Overlay
         JPanel backgroundPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (backgroundImage != null) {
                     g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                    // Overlay ghaméq chwaya bech el khedma wel ktiba t-ban wadha
                     g.setColor(new Color(0, 0, 0, 90));
                     g.fillRect(0, 0, getWidth(), getHeight());
                 }
@@ -48,32 +53,21 @@ public class MainDashboard extends JFrame {
         };
         setContentPane(backgroundPanel);
 
-        // 3. Menu Bar Design
         JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(new Color(33, 37, 41)); // Dark color professional
-        UIManager.put("Menu.foreground", Color.BLACK);
+        menuBar.setBackground(new Color(33, 37, 41));
         setJMenuBar(menuBar);
 
-        // --- Setup Menus ---
         setupMenus(user, menuBar);
+        translateUI("FR"); // Default Language
 
-        // 4. Container Panel: Hetha elli bech i-hiz el Tables
-        // Nesta3mlou GridBagLayout hna bech n-najmou n-centeriw el khedma
         JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setOpaque(false); // Transparent bech n-choufou el background
-
+        wrapper.setOpaque(false);
         container = new JPanel(new BorderLayout());
         container.setOpaque(false);
-
-        // Zidna EmptyBorder kbir lel container bech el Tables ma-yaklouch el blasa lkol
         container.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // N-centeriw el container west el wrapper
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 1.0; gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         wrapper.add(container, gbc);
 
@@ -82,26 +76,31 @@ public class MainDashboard extends JFrame {
     }
 
     private void setupMenus(Utilisateur user, JMenuBar menuBar) {
+        // Administration Menu
         if ("ADMIN".equals(user.getRole())) {
-            JMenu menuGestion = new JMenu("Administration");
-            JMenuItem itemEtudiants = new JMenuItem("Gérer les Étudiants");
-            JMenuItem itemProfs = new JMenuItem("Gérer les Enseignants");
+            menuGestion = new JMenu();
+            itemEtudiants = new JMenuItem();
+            itemProfs = new JMenuItem();
+            itemPers = new JMenuItem();
             itemEtudiants.addActionListener(e -> switchView(new EtudiantManagementPanel()));
             itemProfs.addActionListener(e -> switchView(new EnseignantManagementPanel()));
-            menuGestion.add(itemEtudiants); menuGestion.add(itemProfs);
+            itemPers.addActionListener(e -> switchView(new PersonnelManagementPanel()));
+            menuGestion.add(itemEtudiants); menuGestion.add(itemProfs); menuGestion.add(itemPers);
             menuBar.add(menuGestion);
         }
 
+        // Enseignant Menu
         if ("ENSEIGNANT".equals(user.getRole())) {
-            JMenu menuProf = new JMenu("Espace Enseignant");
-            JMenuItem itemNotes = new JMenuItem("Gestion des Notes");
+            menuProf = new JMenu();
+            itemNotes = new JMenuItem();
             itemNotes.addActionListener(e -> switchView(new NoteManagementPanel()));
             menuProf.add(itemNotes);
             menuBar.add(menuProf);
         }
 
-        JMenu menuUser = new JMenu("Account");
-        JMenuItem itemLogout = new JMenuItem("Déconnexion");
+        // Account Menu
+        menuUser = new JMenu();
+        itemLogout = new JMenuItem();
         itemLogout.addActionListener(e -> {
             this.authController.logout();
             new LoginFrame(this.authController).setVisible(true);
@@ -109,6 +108,72 @@ public class MainDashboard extends JFrame {
         });
         menuUser.add(itemLogout);
         menuBar.add(menuUser);
+
+        // --- Language Menu ---
+        menuLanguage = new JMenu("Language");
+        langFr = new JMenuItem("Français");
+        langEn = new JMenuItem("English");
+        langAr = new JMenuItem("العربية");
+
+        langFr.addActionListener(e -> translateUI("FR"));
+        langEn.addActionListener(e -> translateUI("EN"));
+        langAr.addActionListener(e -> translateUI("AR"));
+
+        menuLanguage.add(langFr);
+        menuLanguage.add(langEn);
+        menuLanguage.add(langAr);
+        menuBar.add(menuLanguage);
+    }
+
+    private void translateUI(String lang) {
+        if (lang.equals("FR")) {
+            if (menuGestion != null) {
+                menuGestion.setText("Administration");
+                itemEtudiants.setText("Gérer les Étudiants");
+                itemProfs.setText("Gérer les Enseignants");
+                itemPers.setText("Gérer les Personnels");
+            }
+            if (menuProf != null) {
+                menuProf.setText("Espace Enseignant");
+                itemNotes.setText("Gestion des Notes");
+            }
+            menuUser.setText("Compte");
+            itemLogout.setText("Déconnexion");
+            updateTitle("FR");
+        } else if (lang.equals("EN")) {
+            if (menuGestion != null) {
+                menuGestion.setText("Administration");
+                itemEtudiants.setText("Manage Students");
+                itemProfs.setText("Manage Teachers");
+                itemPers.setText("Manage Staff");
+            }
+            if (menuProf != null) {
+                menuProf.setText("Teacher Space");
+                itemNotes.setText("Grades Management");
+            }
+            menuUser.setText("Account");
+            itemLogout.setText("Logout");
+            updateTitle("EN");
+        } else if (lang.equals("AR")) {
+            if (menuGestion != null) {
+                menuGestion.setText("الإدارة");
+                itemEtudiants.setText("إدارة الطلاب");
+                itemProfs.setText("إدارة الأساتذة");
+                itemPers.setText("إدارة الموظفين");
+            }
+            if (menuProf != null) {
+                menuProf.setText("فضاء الأستاذ");
+                itemNotes.setText("إدارة الأعداد");
+            }
+            menuUser.setText("الحساب");
+            itemLogout.setText("تسجيل الخروج");
+            updateTitle("AR");
+        }
+    }
+
+    private void updateTitle(String lang) {
+        String base = lang.equals("AR") ? "لوحة القيادة" : (lang.equals("EN") ? "Dashboard" : "Tableau de Bord");
+        setTitle(base + " - " + currentUser.getRole() + " (" + currentUser.getUsername() + ")");
     }
 
     private void initDefaultView(Utilisateur user) {
@@ -122,7 +187,6 @@ public class MainDashboard extends JFrame {
     }
 
     public void switchView(JPanel panel) {
-        // Kol panel n-7ottouh lazem i-koun transparent
         panel.setOpaque(false);
         container.removeAll();
         container.add(panel, BorderLayout.CENTER);
