@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainDashboard extends JFrame {
     private JPanel container;
@@ -16,7 +14,6 @@ public class MainDashboard extends JFrame {
     private Image backgroundImage;
     private Utilisateur currentUser;
 
-    // UI Elements that need translation
     private JMenu menuGestion, menuProf, menuUser, menuLanguage;
     private JMenuItem itemEtudiants, itemProfs, itemPers, itemNotes, itemLogout;
     private JMenuItem langFr, langEn, langAr;
@@ -32,7 +29,7 @@ public class MainDashboard extends JFrame {
         try {
             backgroundImage = ImageIO.read(new File("src/img/download.jpeg"));
         } catch (IOException e) {
-            System.out.println("Erreur: Malqitech el taswira fi src/img/");
+            System.out.println("Erreur: Image introuvable.");
         }
 
         updateTitle("FR");
@@ -58,7 +55,7 @@ public class MainDashboard extends JFrame {
         setJMenuBar(menuBar);
 
         setupMenus(user, menuBar);
-        translateUI("FR"); // Default Language
+        translateUI("FR");
 
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setOpaque(false);
@@ -76,7 +73,6 @@ public class MainDashboard extends JFrame {
     }
 
     private void setupMenus(Utilisateur user, JMenuBar menuBar) {
-        // Administration Menu
         if ("ADMIN".equals(user.getRole())) {
             menuGestion = new JMenu();
             itemEtudiants = new JMenuItem();
@@ -89,16 +85,15 @@ public class MainDashboard extends JFrame {
             menuBar.add(menuGestion);
         }
 
-        // Enseignant Menu
         if ("ENSEIGNANT".equals(user.getRole())) {
             menuProf = new JMenu();
             itemNotes = new JMenuItem();
-            itemNotes.addActionListener(e -> switchView(new NoteManagementPanel()));
+            // FIX: Added the specific listener to load the interactive view
+            itemNotes.addActionListener(e -> switchView(new EnseignantView(user, this)));
             menuProf.add(itemNotes);
             menuBar.add(menuProf);
         }
 
-        // Account Menu
         menuUser = new JMenu();
         itemLogout = new JMenuItem();
         itemLogout.addActionListener(e -> {
@@ -109,19 +104,14 @@ public class MainDashboard extends JFrame {
         menuUser.add(itemLogout);
         menuBar.add(menuUser);
 
-        // --- Language Menu ---
         menuLanguage = new JMenu("Language");
         langFr = new JMenuItem("Français");
         langEn = new JMenuItem("English");
         langAr = new JMenuItem("العربية");
-
         langFr.addActionListener(e -> translateUI("FR"));
         langEn.addActionListener(e -> translateUI("EN"));
         langAr.addActionListener(e -> translateUI("AR"));
-
-        menuLanguage.add(langFr);
-        menuLanguage.add(langEn);
-        menuLanguage.add(langAr);
+        menuLanguage.add(langFr); menuLanguage.add(langEn); menuLanguage.add(langAr);
         menuBar.add(menuLanguage);
     }
 
@@ -180,7 +170,8 @@ public class MainDashboard extends JFrame {
         if ("ADMIN".equals(user.getRole())) {
             switchView(new EtudiantManagementPanel());
         } else if ("ENSEIGNANT".equals(user.getRole())) {
-            switchView(new EnseignantView(user));
+            // FIX: Pass 'this' parameter
+            switchView(new EnseignantView(user, this));
         } else {
             switchView(new EtudiantView(user));
         }
