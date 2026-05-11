@@ -88,7 +88,8 @@ public class EnseignantManagementPanel extends JPanel {
             int row = table.getSelectedRow();
             if (row != -1) {
                 int id = (int) tableModel.getValueAt(row, 0);
-                controller.deleteEnseignant(id);
+                Enseignant ens = controller.findEnseignantById(id);
+                controller.deleteEnseignant(ens);
                 loadData();
             } else {
                 JOptionPane.showMessageDialog(this, "Sélectionnez un enseignant à supprimer");

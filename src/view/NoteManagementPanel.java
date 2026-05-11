@@ -112,7 +112,8 @@ public class NoteManagementPanel extends JPanel {
             int row = table.getSelectedRow();
             if (row != -1) {
                 int id = (int) tableModel.getValueAt(row, 0);
-                noteController.deleteNote(id);
+                Note n = noteController.findNoteById(id);
+                noteController.deleteNote(n);
                 loadNotesTable();
             }
         });

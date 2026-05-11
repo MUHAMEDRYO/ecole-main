@@ -60,7 +60,8 @@ public class EtudiantManagementPanel extends JPanel {
             int row = table.getSelectedRow();
             if (row != -1) {
                 int id = (int) tableModel.getValueAt(row, 0);
-                controller.deleteEtudiant(id);
+                Etudiant et = controller.findEtudiantById(id);
+                controller.deleteEtudiant(et);
                 loadData();
             }
         });

@@ -32,8 +32,12 @@ public class EnseignantController {
         if (enseignant == null) {
             throw new IllegalArgumentException("Enseignant invalide");
         }
-        validateId(enseignant.getId());
-        dao.delete(enseignant.getId());
+        deleteEnseignant(enseignant.getId());
+    }
+
+    public void deleteEnseignant(int id) {
+        validateId(id);
+        dao.delete(id);
     }
 
 

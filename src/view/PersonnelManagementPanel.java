@@ -87,7 +87,8 @@ public class PersonnelManagementPanel extends JPanel {
             int row = table.getSelectedRow();
             if (row != -1) {
                 int id = (int) tableModel.getValueAt(row, 0);
-                controller.deletePersonnel(id);
+                Personnel p = controller.findPersonnelById(id);
+                controller.deletePersonnel(p);
                 loadData();
             } else {
                 JOptionPane.showMessageDialog(this, "Sélectionnez un personnel à supprimer");
