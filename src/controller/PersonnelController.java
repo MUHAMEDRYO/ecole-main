@@ -24,7 +24,7 @@ public class PersonnelController {
         return dao.findAll();
     }
 
-    public void updateEtudiant(Personnel p) {
+    public void updatePersonnel(Personnel p) {
         validatePersonnel(p);
         validateId(p.getId());
         dao.update(p);

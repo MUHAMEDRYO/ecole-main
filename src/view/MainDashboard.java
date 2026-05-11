@@ -15,7 +15,7 @@ public class MainDashboard extends JFrame {
     private Utilisateur currentUser;
 
     private JMenu menuGestion, menuProf, menuUser, menuLanguage, menuMatiere;
-    private JMenuItem itemEtudiants, itemProfs, itemPers, itemNotes, itemLogout, itemShowMatieres;
+    private JMenuItem itemEtudiants, itemProfs, itemPers, itemMatieres, itemNotes, itemLogout, itemShowMatieres;
     private JMenuItem langFr, langEn, langAr;
     private String currentLang = "FR";
 
@@ -78,10 +78,12 @@ public class MainDashboard extends JFrame {
             itemEtudiants = new JMenuItem();
             itemProfs = new JMenuItem();
             itemPers = new JMenuItem();
+            itemMatieres = new JMenuItem();
             itemEtudiants.addActionListener(e -> switchView(new EtudiantManagementPanel()));
             itemProfs.addActionListener(e -> switchView(new EnseignantManagementPanel()));
             itemPers.addActionListener(e -> switchView(new PersonnelManagementPanel()));
-            menuGestion.add(itemEtudiants); menuGestion.add(itemProfs); menuGestion.add(itemPers);
+            itemMatieres.addActionListener(e -> switchView(new MatiereManagementPanel()));
+            menuGestion.add(itemEtudiants); menuGestion.add(itemProfs); menuGestion.add(itemPers); menuGestion.add(itemMatieres);
             menuBar.add(menuGestion);
         }
 
@@ -145,6 +147,7 @@ public class MainDashboard extends JFrame {
                 itemEtudiants.setText("Gérer les Étudiants");
                 itemProfs.setText("Gérer les Enseignants");
                 itemPers.setText("Gérer les Personnels");
+                itemMatieres.setText("Gérer les Matières");
             }
             if (menuProf != null) {
                 menuProf.setText("Espace Enseignant");
@@ -161,6 +164,7 @@ public class MainDashboard extends JFrame {
                 itemEtudiants.setText("Manage Students");
                 itemProfs.setText("Manage Teachers");
                 itemPers.setText("Manage Staff");
+                itemMatieres.setText("Manage Subjects");
             }
             if (menuProf != null) {
                 menuProf.setText("Teacher Space");
@@ -177,6 +181,7 @@ public class MainDashboard extends JFrame {
                 itemEtudiants.setText("إدارة الطلاب");
                 itemProfs.setText("إدارة الأساتذة");
                 itemPers.setText("إدارة الموظفين");
+                itemMatieres.setText("إدارة المواد");
             }
             if (menuProf != null) {
                 menuProf.setText("فضاء الأستاذ");

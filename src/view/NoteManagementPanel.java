@@ -24,19 +24,23 @@ public class NoteManagementPanel extends JPanel {
     private JTextField txtNoteDS = new JTextField(5);
     private JTextField txtNoteExamen = new JTextField(5);
 
+    private JLabel lblEtudiant, lblMatiere, lblNoteDS, lblNoteExamen;
+    private JButton btnAdd, btnSave, btnDelete;
+    private JPanel formPanel, btnPanel;
+
     public NoteManagementPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
         // 1. Form Panel (Inputs)
-        JPanel formPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        formPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         formPanel.setBorder(BorderFactory.createTitledBorder("Saisie des Notes"));
 
         loadComboBoxData();
 
-        formPanel.add(new JLabel("Étudiant:")); formPanel.add(cbEtudiants);
-        formPanel.add(new JLabel("Matière:")); formPanel.add(cbMatieres);
-        formPanel.add(new JLabel("Note DS:")); formPanel.add(txtNoteDS);
-        formPanel.add(new JLabel("Note Examen:")); formPanel.add(txtNoteExamen);
+        lblEtudiant = new JLabel("Étudiant:"); formPanel.add(lblEtudiant); formPanel.add(cbEtudiants);
+        lblMatiere = new JLabel("Matière:"); formPanel.add(lblMatiere); formPanel.add(cbMatieres);
+        lblNoteDS = new JLabel("Note DS:"); formPanel.add(lblNoteDS); formPanel.add(txtNoteDS);
+        lblNoteExamen = new JLabel("Note Examen:"); formPanel.add(lblNoteExamen); formPanel.add(txtNoteExamen);
 
         // 2. Table Setup
         String[] columns = {"ID", "Étudiant", "Matière", "Note DS", "Note Examen", "Moyenne"};
@@ -45,10 +49,10 @@ public class NoteManagementPanel extends JPanel {
         loadNotesTable();
 
         // 3. Buttons Panel
-        JPanel btnPanel = new JPanel();
-        JButton btnAdd = new JButton("Calculer & Ajouter");
-        JButton btnSave = new JButton("Enregistrer dans DB");
-        JButton btnDelete = new JButton("Supprimer");
+        btnPanel = new JPanel();
+        btnAdd = new JButton("Calculer & Ajouter");
+        btnSave = new JButton("Enregistrer dans DB");
+        btnDelete = new JButton("Supprimer");
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnSave);
@@ -117,6 +121,43 @@ public class NoteManagementPanel extends JPanel {
                 loadNotesTable();
             }
         });
+        
+        translateUI("FR");
+    }
+
+    public void translateUI(String lang) {
+        if (lang.equals("AR")) {
+            formPanel.setBorder(BorderFactory.createTitledBorder("إدخال الأعداد"));
+            lblEtudiant.setText("الطالب:");
+            lblMatiere.setText("المادة:");
+            lblNoteDS.setText("ملاحظة DS:");
+            lblNoteExamen.setText("ملاحظة الامتحان:");
+            btnAdd.setText("احسب وأضف");
+            btnSave.setText("حفظ في قاعدة البيانات");
+            btnDelete.setText("حذف");
+            tableModel.setColumnIdentifiers(new Object[]{"المعرف", "الطالب", "المادة", "ملاحظة DS", "ملاحظة الامتحان", "المعدل"});
+        } else if (lang.equals("EN")) {
+            formPanel.setBorder(BorderFactory.createTitledBorder("Enter Grades"));
+            lblEtudiant.setText("Student:");
+            lblMatiere.setText("Subject:");
+            lblNoteDS.setText("DS Grade:");
+            lblNoteExamen.setText("Exam Grade:");
+            btnAdd.setText("Calculate & Add");
+            btnSave.setText("Save to DB");
+            btnDelete.setText("Delete");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Student", "Subject", "DS Grade", "Exam Grade", "Average"});
+        } else {
+            formPanel.setBorder(BorderFactory.createTitledBorder("Saisie des Notes"));
+            lblEtudiant.setText("Étudiant:");
+            lblMatiere.setText("Matière:");
+            lblNoteDS.setText("Note DS:");
+            lblNoteExamen.setText("Note Examen:");
+            btnAdd.setText("Calculer & Ajouter");
+            btnSave.setText("Enregistrer dans DB");
+            btnDelete.setText("Supprimer");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Étudiant", "Matière", "Note DS", "Note Examen", "Moyenne"});
+        }
+        loadNotesTable();
     }
 
     private void loadComboBoxData() {

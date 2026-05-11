@@ -159,17 +159,42 @@ public class EnseignantView extends JPanel {
     }
 
     private void openEditNotesDialog(int row) {
-        String nom = modelEtudiants.getValueAt(row, 1).toString();
+        int etudiantId = (int) modelEtudiants.getValueAt(row, 0);
+        String nom = modelEtudiants.getValueAt(row, 1).toString() + " " + modelEtudiants.getValueAt(row, 2).toString();
+        
         JPanel dialogPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+        JComboBox<Matiere> cbMatieres = new JComboBox<>();
+        List<Matiere> matieres = matiereController.findAllMatieres();
+        for (Matiere m : matieres) cbMatieres.addItem(m);
+
         JTextField txtDS = new JTextField();
         JTextField txtExam = new JTextField();
+
         dialogPanel.add(new JLabel("Étudiant:"));
         dialogPanel.add(new JLabel(nom));
+        dialogPanel.add(new JLabel("Matière:"));
+        dialogPanel.add(cbMatieres);
         dialogPanel.add(new JLabel("Note DS:"));
         dialogPanel.add(txtDS);
         dialogPanel.add(new JLabel("Note Examen:"));
         dialogPanel.add(txtExam);
-        JOptionPane.showConfirmDialog(null, dialogPanel, "Saisie des Notes", JOptionPane.OK_CANCEL_OPTION);
+
+        int result = JOptionPane.showConfirmDialog(null, dialogPanel, "Saisie des Notes", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                controller.NoteController noteController = new controller.NoteController();
+                model.Note note = new model.Note();
+                note.setEtudiant(etudiantController.findEtudiantById(etudiantId));
+                note.setMatiere((Matiere) cbMatieres.getSelectedItem());
+                note.setNoteDs(Double.parseDouble(txtDS.getText()));
+                note.setNoteExamen(Double.parseDouble(txtExam.getText()));
+                
+                noteController.addNote(note);
+                JOptionPane.showMessageDialog(this, "Note enregistrée avec succès !");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage());
+            }
+        }
     }
 
     private void loadEtudiants() {

@@ -12,6 +12,8 @@ public class Etudiant extends Utilisateur {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
+        setRole("ETUDIANT");
+        setUsername(email);
     }
 
     public Etudiant(int id, String nom, String prenom, String email) {

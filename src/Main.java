@@ -1,6 +1,6 @@
 
 import view.LoginFrame;
-import util.SingletonConnection;
+import config.Connexion;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -16,7 +16,9 @@ public class Main {
 
 
         try {
-            util.SingletonConnection.getConnection();
+            if (Connexion.getConnection() == null) {
+                throw new Exception("Connection is null");
+            }
             System.out.println("Database connection established successfully.");
         } catch (Exception e) {
             System.err.println("Failed to connect to the database: " + e.getMessage());

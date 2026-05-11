@@ -51,9 +51,15 @@ public class EtudiantManagementPanel extends JPanel {
 
         // Action Listeners [cite: 25, 26, 27, 28]
         btnAdd.addActionListener(e -> {
-            Etudiant et = new Etudiant(txtNom.getText(), txtPrenom.getText(), txtEmail.getText());
-            controller.addEtudiant(et);
-            loadData();
+            try {
+                Etudiant et = new Etudiant(txtNom.getText(), txtPrenom.getText(), txtEmail.getText());
+                controller.addEtudiant(et);
+                JOptionPane.showMessageDialog(this, "Étudiant ajouté avec succès !");
+                loadData();
+                clearFields();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage());
+            }
         });
 
         btnDel.addActionListener(e -> {
@@ -66,9 +72,15 @@ public class EtudiantManagementPanel extends JPanel {
             }
         });
 
-        btnClose.addActionListener(e -> System.exit(0));
+        btnClose.addActionListener(e -> clearFields());
         
         translateUI("FR");
+    }
+
+    private void clearFields() {
+        txtNom.setText("");
+        txtPrenom.setText("");
+        txtEmail.setText("");
     }
 
     public void translateUI(String lang) {

@@ -73,20 +73,4 @@ public class EtudiantView extends JPanel {
             });
         }
     }
-    private void showMatières() {
-        MatiereController matiereController = new MatiereController();
-        List<Matiere> matieres = matiereController.findAllMatieres();
-
-        String[] columns = {"ID", "Nom", "Enseignant"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
-
-        for (Matiere m : matieres) {
-            String profName = (m.getEnseignant() != null) ? m.getEnseignant().getNom() + " " + m.getEnseignant().getPrenom() : "N/A";
-            model.addRow(new Object[]{m.getId(), m.getNom(), profName});
-        }
-
-        JTable table = new JTable(model);
-        JOptionPane.showMessageDialog(this, new JScrollPane(table), "Liste des Matières", JOptionPane.INFORMATION_MESSAGE);
-    }
-
 }

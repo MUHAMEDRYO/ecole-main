@@ -12,7 +12,11 @@ public class AuthController {
                 password == null || password.trim().isEmpty()) {
             return null;
         }
-        return dao.findByLogin(username, password);
+        Utilisateur user = dao.findByLogin(username, password);
+        if (user != null) {
+            this.currentUser = user;
+        }
+        return user;
     }
 
     public void logout() {
@@ -26,24 +30,4 @@ public class AuthController {
     public boolean isLoggedIn() {
         return currentUser != null;
     }
-
-    public String navigate(Utilisateur user) {
-        if (user == null || user.getRole() == null) {
-            return null;
-        }
-
-        switch (user.getRole()) {
-            case "ENSEIGNANT":
-                return "/views/enseignant.fxml";
-            case "ETUDIANT":
-                return "/views/etudiant.fxml";
-            case "ADMIN":
-                return "/views/personnel.fxml";
-            default:
-                return null;
-        }
-    }
-
-
-
 }
