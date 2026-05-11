@@ -4,6 +4,7 @@ import controller.AuthController;
 import model.Utilisateur;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -195,13 +196,7 @@ public class MainDashboard extends JFrame {
         }
         
         // Translate the current panel if it supports translation
-        if (container.getComponentCount() > 0) {
-            Component currentPanel = container.getComponent(0);
-            try {
-                java.lang.reflect.Method method = currentPanel.getClass().getMethod("translateUI", String.class);
-                method.invoke(currentPanel, lang);
-            } catch (Exception ignored) {}
-        }
+
     }
 
     private void updateTitle(String lang) {

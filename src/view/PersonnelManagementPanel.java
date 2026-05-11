@@ -1,7 +1,6 @@
 package view;
 
 import controller.PersonnelController;
-
 import model.Personnel;
 
 import javax.swing.*;
@@ -14,11 +13,9 @@ public class PersonnelManagementPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
-    // Form fields
     private JTextField txtNom = new JTextField(10);
     private JTextField txtPrenom = new JTextField(10);
     private JTextField txtEmail = new JTextField(15);
-
 
     private JLabel lblNom, lblPrenom, lblEmail;
     private JButton btnAdd, btnEdit, btnDel, btnRefresh, btnClear;
@@ -26,12 +23,16 @@ public class PersonnelManagementPanel extends JPanel {
 
     public PersonnelManagementPanel() {
         setLayout(new BorderLayout());
-
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
 
         // 1. Table Setup
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Prevent direct editing in the table cells
+            }
+        };
         table = new JTable(tableModel);
         loadData();
 
@@ -42,7 +43,6 @@ public class PersonnelManagementPanel extends JPanel {
         lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
         lblPrenom = new JLabel("Prénom:"); formPanel.add(lblPrenom); formPanel.add(txtPrenom);
         lblEmail = new JLabel("Email:"); formPanel.add(lblEmail); formPanel.add(txtEmail);
-
 
         // 3. Buttons Panel
         btnPanel = new JPanel();
@@ -58,50 +58,93 @@ public class PersonnelManagementPanel extends JPanel {
         btnPanel.add(btnRefresh);
         btnPanel.add(btnClear);
 
-        // 4. Layout Assembly
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(formPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // --- Action Listeners ---
-
-        // Ajouter (Directement en DB pour avoir l'ID)
-        btnAdd.addActionListener(e -> {
-            try {
-                Personnel ens = new Personnel();
-                ens.setNom(txtNom.getText());
-                ens.setPrenom(txtPrenom.getText());
-                ens.setEmail(txtEmail.getText());
-                ens.setPassword("123456"); 
-                controller.addPersonnel(ens);
-                JOptionPane.showMessageDialog(this, "Personnel ajouté avec succès !");
-                loadData();
-                clearFields();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage());
+        // --- NEW: Table Selection Listener ---
+        // Fills the text fields when a user clicks a row in the table
+        table.getSelectionModel().addListSelectionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                txtNom.setText(table.getValueAt(row, 1).toString());
+                txtPrenom.setText(table.getValueAt(row, 2).toString());
+                txtEmail.setText(table.getValueAt(row, 3).toString());
             }
         });
 
-        // Supprimer
-        btnDel.addActionListener(e -> {
+        btnAdd.addActionListener(e -> {
+            if(validateFields()) {
+                try {
+                    Personnel ens = new Personnel();
+                    ens.setNom(txtNom.getText());
+                    ens.setPrenom(txtPrenom.getText());
+                    ens.setEmail(txtEmail.getText());
+                    ens.setRole("PERSONNEL"); 
+                    ens.setPassword("123456");
+
+                    controller.addPersonnel(ens);
+
+                    JOptionPane.showMessageDialog(this, "Personnel ajouté avec succès !");
+                    loadData();
+                    clearFields();
+                } catch (RuntimeException ex) {
+
+                    if (ex.getMessage().contains("Duplicate") || ex.getCause().toString().contains("ConstraintViolation")) {
+                        JOptionPane.showMessageDialog(this, "Erreur : Cet email est déjà utilisé !");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Erreur technique : " + ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        btnEdit.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
                 int id = (int) tableModel.getValueAt(row, 0);
                 Personnel p = controller.findPersonnelById(id);
-                controller.deletePersonnel(p);
+                p.setNom(txtNom.getText());
+                p.setPrenom(txtPrenom.getText());
+                p.setEmail(txtEmail.getText());
+
+                controller.updatePersonnel(p); // Assumes you have this in your controller
+                JOptionPane.showMessageDialog(this, "Mis à jour avec succès");
                 loadData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Sélectionnez une ligne à modifier");
+            }
+        });
+
+        btnDel.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                int confirm = JOptionPane.showConfirmDialog(this, "Supprimer ce personnel ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    int id = (int) tableModel.getValueAt(row, 0);
+                    Personnel p = controller.findPersonnelById(id);
+                    controller.deletePersonnel(p);
+                    loadData();
+                    clearFields();
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Sélectionnez un personnel à supprimer");
             }
         });
 
-        // Actualiser
         btnRefresh.addActionListener(e -> loadData());
-
-        // Vider les champs
         btnClear.addActionListener(e -> clearFields());
-        
+
         translateUI("FR");
+    }
+
+    // --- NEW: Basic Validation ---
+    private boolean validateFields() {
+        if (txtNom.getText().isEmpty() || txtEmail.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir les champs obligatoires");
+            return false;
+        }
+        return true;
     }
 
     public void translateUI(String lang) {
@@ -151,7 +194,6 @@ public class PersonnelManagementPanel extends JPanel {
                     e.getNom(),
                     e.getPrenom(),
                     e.getEmail(),
-
             });
         }
     }
@@ -160,7 +202,6 @@ public class PersonnelManagementPanel extends JPanel {
         txtNom.setText("");
         txtPrenom.setText("");
         txtEmail.setText("");
-
+        table.clearSelection();
     }
 }
-

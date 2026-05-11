@@ -34,6 +34,8 @@ public class UtilisateurDaoImp implements GenericDao<Utilisateur> {
 
         return null;
     }
+  
+
     @Override
     public void add(Utilisateur entity) {
         String sql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
