@@ -6,12 +6,12 @@ public class Personnel extends Utilisateur {
     private String email;
 
     public Personnel() {
-        setRole("ADMIN");
+        setRole("PERSONNEL");
     }
 
     public Personnel(int id, String nom, String prenom, String email) {
         setId(id);
-        setRole("ADMIN");
+        setRole("PERSONNEL");
         setUsername(email);
         this.nom = nom;
         this.prenom = prenom;

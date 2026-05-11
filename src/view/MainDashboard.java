@@ -172,6 +172,8 @@ public class MainDashboard extends JFrame {
         } else if ("ENSEIGNANT".equals(user.getRole())) {
             // FIX: Pass 'this' parameter
             switchView(new EnseignantView(user, this));
+        } else if ("PERSONNEL".equals(user.getRole())) {
+            switchView(new PersonnelView(user));
         } else {
             switchView(new EtudiantView(user));
         }

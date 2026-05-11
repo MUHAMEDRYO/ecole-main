@@ -1,5 +1,6 @@
 package view;
 
+import controller.AuthController;
 import controller.EtudiantController;
 import controller.MatiereController;
 import model.Etudiant;
@@ -7,7 +8,12 @@ import model.Matiere;
 import model.Utilisateur;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.List;
 
 public class EnseignantView extends JPanel {
@@ -28,6 +34,7 @@ public class EnseignantView extends JPanel {
     public EnseignantView(Utilisateur prof, MainDashboard dashboard) {
         setLayout(new BorderLayout());
 
+
         // --- MENU BAR ---
         JMenuBar menuBar = new JMenuBar();
         JMenu menuGérer = new JMenu("Gérer les Notes");
@@ -41,7 +48,7 @@ public class EnseignantView extends JPanel {
         itemLogout.addActionListener(e -> {
             dashboard.dispose(); // Close current dashboard
             // Assuming LoginFrame takes an AuthController or similar
-            new LoginFrame(new controller.AuthController()).setVisible(true);
+            new LoginFrame(new AuthController()).setVisible(true);
         });
 
         // Language Menu
@@ -104,6 +111,14 @@ public class EnseignantView extends JPanel {
 
     private JPanel createNotesPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+
+        // Header with Matières button
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JButton btnMatiere = new JButton("Matières");
+        btnMatiere.addActionListener(e -> showMatières());
+        topPanel.add(btnMatiere, BorderLayout.EAST);
+        panel.add(topPanel, BorderLayout.NORTH);
+
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         modelEtudiants = new DefaultTableModel(columns, 0);
         tableEtudiants = new JTable(modelEtudiants);
@@ -118,6 +133,20 @@ public class EnseignantView extends JPanel {
         panel.add(new JScrollPane(tableEtudiants), BorderLayout.CENTER);
         panel.setBorder(BorderFactory.createTitledBorder("Liste des Étudiants"));
         return panel;
+    }
+
+    private void showMatières() {
+        List<Matiere> matieres = matiereController.findAllMatieres();
+        String[] columns = {"ID", "Nom", "Enseignant"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+
+        for (Matiere m : matieres) {
+            String profName = (m.getEnseignant() != null) ? m.getEnseignant().getNom() + " " + m.getEnseignant().getPrenom() : "N/A";
+            model.addRow(new Object[]{m.getId(), m.getNom(), profName});
+        }
+
+        JTable table = new JTable(model);
+        JOptionPane.showMessageDialog(this, new JScrollPane(table), "Liste des Matières", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JPanel createProfPanel(Utilisateur prof) {

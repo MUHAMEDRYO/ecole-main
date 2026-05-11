@@ -16,7 +16,7 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
 
     @Override
     public void add(Personnel entity) {
-        String utilisateurSql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, 'ADMIN')";
+        String utilisateurSql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
         String personnelSql = "INSERT INTO personnel (nom, prenom, email, utilisateur_id) VALUES (?, ?, ?, ?)";
 
         try {
@@ -26,6 +26,7 @@ public class PersonnelDaoImp implements GenericDao<Personnel> {
             try (PreparedStatement ps = connection.prepareStatement(utilisateurSql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, getUsername(entity));
                 ps.setString(2, entity.getPassword());
+                ps.setString(3, entity.getRole());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
