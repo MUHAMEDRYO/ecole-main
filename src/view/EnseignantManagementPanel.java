@@ -28,13 +28,11 @@ public class EnseignantManagementPanel extends JPanel {
 
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
 
-        // 1. Table Setup
         String[] columns = {"ID", "Nom", "Prénom", "Email", "Grade", "Spécialité"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         loadData();
 
-        // 2. Form Panel
         formPanel = new JPanel(new GridLayout(2, 6, 5, 5));
         formPanel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
 
@@ -44,7 +42,6 @@ public class EnseignantManagementPanel extends JPanel {
         lblGrade = new JLabel("Grade:"); formPanel.add(lblGrade); formPanel.add(txtGrade);
         lblSpecialite = new JLabel("Spécialité:"); formPanel.add(lblSpecialite); formPanel.add(txtSpecialite);
 
-        // 3. Buttons Panel
         btnPanel = new JPanel();
         btnAdd = new JButton("Ajouter");
         btnEdit = new JButton("Modifier");
@@ -58,14 +55,10 @@ public class EnseignantManagementPanel extends JPanel {
         btnPanel.add(btnRefresh);
         btnPanel.add(btnClear);
 
-        // 4. Layout Assembly
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(formPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // --- Action Listeners ---
-
-        // Ajouter (Directement en DB pour avoir l'ID)
         btnAdd.addActionListener(e -> {
             try {
                 Enseignant ens = new Enseignant();
@@ -83,7 +76,6 @@ public class EnseignantManagementPanel extends JPanel {
             }
         });
 
-        // Supprimer
         btnDel.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
@@ -96,10 +88,8 @@ public class EnseignantManagementPanel extends JPanel {
             }
         });
 
-        // Actualiser
         btnRefresh.addActionListener(e -> loadData());
 
-        // Vider les champs
         btnClear.addActionListener(e -> clearFields());
         
         translateUI("FR");

@@ -34,12 +34,9 @@ public class EnseignantView extends JPanel {
     private JLabel lblUserProf, lblRoleProf;
     private JPanel notesPanel, profPanel;
 
-    // Changed parentFrame to MainDashboard to access its methods
     public EnseignantView(Utilisateur prof, MainDashboard dashboard) {
         setLayout(new BorderLayout());
 
-
-        // --- MENU BAR ---
         JMenuBar menuBar = new JMenuBar();
         menuGérer = new JMenu("Gérer les Notes");
         menuEspace = new JMenu("Espace Enseignant");
@@ -48,20 +45,16 @@ public class EnseignantView extends JPanel {
         menuCompte = new JMenu("Compte");
         menuCompte.add(itemLogout);
 
-        // ACTION: LOGOUT
         itemLogout.addActionListener(e -> {
-            dashboard.dispose(); // Close current dashboard
-            // Assuming LoginFrame takes an AuthController or similar
+            dashboard.dispose();
             new LoginFrame(new AuthController()).setVisible(true);
         });
 
-        // Language Menu
         menuLanguage = new JMenu("Language");
         menuLanguage.add(langFr);
         menuLanguage.add(langEn);
         menuLanguage.add(langAr);
 
-        // ACTIONS: LANGUAGE SWITCHING
         langFr.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard))); // Refresh view
         langEn.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard))); 
         langAr.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard)));
@@ -85,7 +78,6 @@ public class EnseignantView extends JPanel {
 
         dashboard.setJMenuBar(menuBar);
 
-        // --- CONTENT ---
         notesPanel = createNotesPanel();
         profPanel = createProfPanel(prof);
 

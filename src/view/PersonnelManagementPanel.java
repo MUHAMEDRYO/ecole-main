@@ -80,7 +80,7 @@ public class PersonnelManagementPanel extends JPanel {
                     ens.setNom(txtNom.getText());
                     ens.setPrenom(txtPrenom.getText());
                     ens.setEmail(txtEmail.getText());
-                    ens.setRole("PERSONNEL"); 
+                    ens.setRole("PERSONNEL");
                     ens.setPassword("123456");
 
                     controller.addPersonnel(ens);
@@ -138,7 +138,7 @@ public class PersonnelManagementPanel extends JPanel {
         translateUI("FR");
     }
 
-    // --- NEW: Basic Validation ---
+
     private boolean validateFields() {
         if (txtNom.getText().isEmpty() || txtEmail.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir les champs obligatoires");

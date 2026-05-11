@@ -24,15 +24,12 @@ public class EtudiantView extends JPanel {
         this.currentEtudiant = etudiant;
         setLayout(new BorderLayout());
 
-        // Header
         JPanel topPanel = new JPanel(new BorderLayout());
         lblInfo = new JLabel("", SwingConstants.CENTER);
         lblInfo.setFont(new Font("Arial", Font.BOLD, 16));
         topPanel.add(lblInfo, BorderLayout.CENTER);
 
         add(topPanel, BorderLayout.NORTH);
-
-        // Table Notes
         String[] columns = {"Matière", "Note DS", "Note Examen", "Moyenne"};
         modelNotes = new DefaultTableModel(columns, 0);
         tableNotes = new JTable(modelNotes);
@@ -41,7 +38,7 @@ public class EtudiantView extends JPanel {
         scrollPane = new JScrollPane(tableNotes);
         add(scrollPane, BorderLayout.CENTER);
         
-        translateUI("FR"); // Default
+        translateUI("FR");
     }
 
     public void translateUI(String lang) {

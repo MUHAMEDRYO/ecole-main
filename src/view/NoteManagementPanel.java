@@ -31,7 +31,7 @@ public class NoteManagementPanel extends JPanel {
     public NoteManagementPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
-        // 1. Form Panel (Inputs)
+
         formPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         formPanel.setBorder(BorderFactory.createTitledBorder("Saisie des Notes"));
 
@@ -42,7 +42,7 @@ public class NoteManagementPanel extends JPanel {
         lblNoteDS = new JLabel("Note DS:"); formPanel.add(lblNoteDS); formPanel.add(txtNoteDS);
         lblNoteExamen = new JLabel("Note Examen:"); formPanel.add(lblNoteExamen); formPanel.add(txtNoteExamen);
 
-        // 2. Table Setup
+
         String[] columns = {"ID", "Étudiant", "Matière", "Note DS", "Note Examen", "Moyenne"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
@@ -63,9 +63,9 @@ public class NoteManagementPanel extends JPanel {
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // --- Logic ---
 
-        // Button: Ajouter à la table (Simulation)
+
+
         btnAdd.addActionListener(e -> {
             try {
                 double ds = Double.parseDouble(txtNoteDS.getText());

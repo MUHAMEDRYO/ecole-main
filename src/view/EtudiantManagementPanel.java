@@ -22,19 +22,16 @@ public class EtudiantManagementPanel extends JPanel {
         setLayout(new BorderLayout());
 
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
-        // Table
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         loadData();
 
-        // Form
         formPanel = new JPanel();
         lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
         lblPrenom = new JLabel("Prénom:"); formPanel.add(lblPrenom); formPanel.add(txtPrenom);
         lblEmail = new JLabel("Email:"); formPanel.add(lblEmail); formPanel.add(txtEmail);
 
-        // Buttons [cite: 24]
         btnPanel = new JPanel();
         btnAdd = new JButton("Ajouter");
         btnEdit = new JButton("Modifier");
@@ -49,7 +46,6 @@ public class EtudiantManagementPanel extends JPanel {
         add(formPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // Action Listeners [cite: 25, 26, 27, 28]
         btnAdd.addActionListener(e -> {
             try {
                 Etudiant et = new Etudiant(txtNom.getText(), txtPrenom.getText(), txtEmail.getText());

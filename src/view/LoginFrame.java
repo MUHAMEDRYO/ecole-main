@@ -39,15 +39,12 @@ public class LoginFrame extends JFrame {
             System.out.println("Erreur: Malqitech el taswira fi src/img/");
         }
 
-        // --- Updated Menu Bar ---
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(new Color(255, 255, 255, 200));
 
-        // 1. Help Menu
         itemContact.addActionListener(e -> showHelpDialog());
         menuHelp.add(itemContact);
 
-        // 2. Language Menu
         JMenuItem fr = new JMenuItem("Français");
         JMenuItem en = new JMenuItem("English");
         JMenuItem ar = new JMenuItem("العربية");
@@ -56,18 +53,14 @@ public class LoginFrame extends JFrame {
         ar.addActionListener(al -> updateLanguage("AR"));
         menuLang.add(fr); menuLang.add(en); menuLang.add(ar);
 
-        // 3. Assemble Menu Bar
         lblStatus.setForeground(new Color(0, 150, 0)); // Green for online
         lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
         menuBar.add(menuHelp);
         menuBar.add(Box.createHorizontalGlue()); // Push language and status to right
         menuBar.add(lblStatus);
         menuBar.add(new JSeparator(SwingConstants.VERTICAL));
         menuBar.add(menuLang);
         setJMenuBar(menuBar);
-
-        // --- Main Panel Design ---
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -124,8 +117,6 @@ public class LoginFrame extends JFrame {
         gbc.gridy = 5;
         gbc.insets = new Insets(25, 10, 10, 10);
         add(btnLogin, gbc);
-
-        // Enter key triggers login
         this.getRootPane().setDefaultButton(btnLogin);
 
         btnLogin.addActionListener(e -> handleLogin());

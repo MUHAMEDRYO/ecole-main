@@ -27,13 +27,13 @@ public class MatiereManagementPanel extends JPanel {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
 
-        // 1. Table Setup
+
         String[] columns = {"ID", "Nom", "Enseignant"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         loadData();
 
-        // 2. Form Panel
+
         formPanel = new JPanel(new GridLayout(2, 2, 5, 5));
         formPanel.setBorder(BorderFactory.createTitledBorder("Informations Matière"));
 
@@ -41,7 +41,6 @@ public class MatiereManagementPanel extends JPanel {
         lblEnseignant = new JLabel("Enseignant:"); formPanel.add(lblEnseignant); formPanel.add(cbEnseignants);
         loadEnseignants();
 
-        // 3. Buttons Panel
         btnPanel = new JPanel();
         btnAdd = new JButton("Ajouter");
         btnDel = new JButton("Supprimer");
@@ -57,7 +56,7 @@ public class MatiereManagementPanel extends JPanel {
         add(formPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // Action Listeners
+
         btnAdd.addActionListener(e -> {
             try {
                 Matiere m = new Matiere();

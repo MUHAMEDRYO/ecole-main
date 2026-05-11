@@ -96,7 +96,7 @@ public class MainDashboard extends JFrame {
             menuBar.add(menuProf);
         }
 
-        // Menu Matières for everyone
+
         menuMatiere = new JMenu();
         itemShowMatieres = new JMenuItem();
         itemShowMatieres.addActionListener(e -> showMatièresDialog());
@@ -195,7 +195,7 @@ public class MainDashboard extends JFrame {
             updateTitle("AR");
         }
         
-        // Translate the current panel if it supports translation
+
 
     }
 
