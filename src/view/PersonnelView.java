@@ -16,34 +16,54 @@ public class PersonnelView extends JPanel {
     private MatiereController matiereController = new MatiereController();
     private final Utilisateur currentPersonnel;
 
+    private JLabel lblInfo, lblUser, lblRole;
+    private JPanel infoPanel;
+
     public PersonnelView(Utilisateur personnel) {
         this.currentPersonnel = personnel;
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel("Espace Personnel - " + personnel.getUsername(), SwingConstants.CENTER);
+        lblInfo = new JLabel("", SwingConstants.CENTER);
         lblInfo.setFont(new Font("Arial", Font.BOLD, 16));
         topPanel.add(lblInfo, BorderLayout.CENTER);
 
-        JButton btnMatiere = new JButton("Matières");
-        btnMatiere.addActionListener(e -> showMatières());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(btnMatiere);
-        topPanel.add(buttonPanel, BorderLayout.EAST);
-
         add(topPanel, BorderLayout.NORTH);
 
-        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setBorder(BorderFactory.createTitledBorder("Mes Informations"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        infoPanel.add(new JLabel("Nom d'utilisateur: " + personnel.getUsername()), gbc);
+        lblUser = new JLabel("Nom d'utilisateur: " + personnel.getUsername());
+        infoPanel.add(lblUser, gbc);
         gbc.gridy++;
-        infoPanel.add(new JLabel("Rôle: " + personnel.getRole()), gbc);
+        lblRole = new JLabel("Rôle: " + personnel.getRole());
+        infoPanel.add(lblRole, gbc);
 
         add(infoPanel, BorderLayout.CENTER);
+        
+        translateUI("FR");
+    }
+
+    public void translateUI(String lang) {
+        if (lang.equals("AR")) {
+            lblInfo.setText("فضاء الموظفين - " + currentPersonnel.getUsername());
+            infoPanel.setBorder(BorderFactory.createTitledBorder("معلوماتي"));
+            lblUser.setText("اسم المستخدم: " + currentPersonnel.getUsername());
+            lblRole.setText("الدور: " + currentPersonnel.getRole());
+        } else if (lang.equals("EN")) {
+            lblInfo.setText("Staff Space - " + currentPersonnel.getUsername());
+            infoPanel.setBorder(BorderFactory.createTitledBorder("My Information"));
+            lblUser.setText("Username: " + currentPersonnel.getUsername());
+            lblRole.setText("Role: " + currentPersonnel.getRole());
+        } else {
+            lblInfo.setText("Espace Personnel - " + currentPersonnel.getUsername());
+            infoPanel.setBorder(BorderFactory.createTitledBorder("Mes Informations"));
+            lblUser.setText("Nom d'utilisateur: " + currentPersonnel.getUsername());
+            lblRole.setText("Rôle: " + currentPersonnel.getRole());
+        }
     }
 
     private void showMatières() {

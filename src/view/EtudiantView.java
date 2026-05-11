@@ -17,28 +17,20 @@ public class EtudiantView extends JPanel {
     private DefaultTableModel modelNotes;
     private final Utilisateur currentEtudiant;
 
+    private JLabel lblInfo;
+    private JScrollPane scrollPane;
+
     public EtudiantView(Utilisateur etudiant) {
         this.currentEtudiant = etudiant;
         setLayout(new BorderLayout());
 
         // Header
         JPanel topPanel = new JPanel(new BorderLayout());
-
-        JLabel lblInfo = new JLabel("Mes Notes - Étudiant: " + etudiant.getUsername(), SwingConstants.CENTER);
+        lblInfo = new JLabel("", SwingConstants.CENTER);
         lblInfo.setFont(new Font("Arial", Font.BOLD, 16));
         topPanel.add(lblInfo, BorderLayout.CENTER);
 
-        //nzid button matiere +
-        JButton btnMatiere = new JButton("Matières");
-        btnMatiere.addActionListener(e -> showMatières() );
-        // Add button to a small sub-panel for better alignment
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(btnMatiere);
-        topPanel.add(buttonPanel, BorderLayout.EAST);
-
         add(topPanel, BorderLayout.NORTH);
-
-
 
         // Table Notes
         String[] columns = {"Matière", "Note DS", "Note Examen", "Moyenne"};
@@ -46,7 +38,24 @@ public class EtudiantView extends JPanel {
         tableNotes = new JTable(modelNotes);
         loadMyNotes();
 
-        add(new JScrollPane(tableNotes), BorderLayout.CENTER);
+        scrollPane = new JScrollPane(tableNotes);
+        add(scrollPane, BorderLayout.CENTER);
+        
+        translateUI("FR"); // Default
+    }
+
+    public void translateUI(String lang) {
+        if (lang.equals("AR")) {
+            lblInfo.setText("ملاحظاتي - الطالب: " + currentEtudiant.getUsername());
+            modelNotes.setColumnIdentifiers(new Object[]{"المادة", "ملاحظة DS", "ملاحظة الامتحان", "المعدل"});
+        } else if (lang.equals("EN")) {
+            lblInfo.setText("My Grades - Student: " + currentEtudiant.getUsername());
+            modelNotes.setColumnIdentifiers(new Object[]{"Subject", "DS Grade", "Exam Grade", "Average"});
+        } else {
+            lblInfo.setText("Mes Notes - Étudiant: " + currentEtudiant.getUsername());
+            modelNotes.setColumnIdentifiers(new Object[]{"Matière", "Note DS", "Note Examen", "Moyenne"});
+        }
+        loadMyNotes();
     }
 
     private void loadMyNotes() {

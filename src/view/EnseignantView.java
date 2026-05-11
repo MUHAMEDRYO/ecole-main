@@ -30,6 +30,10 @@ public class EnseignantView extends JPanel {
     private CardLayout cardLayout = new CardLayout();
     private JPanel cards = new JPanel(cardLayout);
 
+    private JMenu menuGérer, menuEspace, menuCompte, menuLanguage;
+    private JLabel lblUserProf, lblRoleProf;
+    private JPanel notesPanel, profPanel;
+
     // Changed parentFrame to MainDashboard to access its methods
     public EnseignantView(Utilisateur prof, MainDashboard dashboard) {
         setLayout(new BorderLayout());
@@ -37,11 +41,11 @@ public class EnseignantView extends JPanel {
 
         // --- MENU BAR ---
         JMenuBar menuBar = new JMenuBar();
-        JMenu menuGérer = new JMenu("Gérer les Notes");
-        JMenu menuEspace = new JMenu("Espace Enseignant");
+        menuGérer = new JMenu("Gérer les Notes");
+        menuEspace = new JMenu("Espace Enseignant");
 
         // Compte Menu
-        JMenu menuCompte = new JMenu("Compte");
+        menuCompte = new JMenu("Compte");
         menuCompte.add(itemLogout);
 
         // ACTION: LOGOUT
@@ -52,15 +56,15 @@ public class EnseignantView extends JPanel {
         });
 
         // Language Menu
-        JMenu menuLanguage = new JMenu("Language");
+        menuLanguage = new JMenu("Language");
         menuLanguage.add(langFr);
         menuLanguage.add(langEn);
         menuLanguage.add(langAr);
 
         // ACTIONS: LANGUAGE SWITCHING
-        langFr.addActionListener(e -> translateUI("FR", menuGérer, menuEspace, menuCompte));
-        langEn.addActionListener(e -> translateUI("EN", menuGérer, menuEspace, menuCompte));
-        langAr.addActionListener(e -> translateUI("AR", menuGérer, menuEspace, menuCompte));
+        langFr.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard))); // Refresh view
+        langEn.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard))); 
+        langAr.addActionListener(e -> dashboard.switchView(new EnseignantView(prof, dashboard)));
 
         menuGérer.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -82,42 +86,47 @@ public class EnseignantView extends JPanel {
         dashboard.setJMenuBar(menuBar);
 
         // --- CONTENT ---
-        JPanel notesPanel = createNotesPanel();
-        JPanel profPanel = createProfPanel(prof);
+        notesPanel = createNotesPanel();
+        profPanel = createProfPanel(prof);
 
         cards.add(notesPanel, "NOTES");
         cards.add(profPanel, "PROFIL");
         add(cards, BorderLayout.CENTER);
+        
+        translateUI("FR"); // Default
     }
 
-    private void translateUI(String lang, JMenu m1, JMenu m2, JMenu m3) {
+    public void translateUI(String lang) {
         if (lang.equals("FR")) {
-            m1.setText("Gérer les Notes");
-            m2.setText("Espace Enseignant");
-            m3.setText("Compte");
+            menuGérer.setText("Gérer les Notes");
+            menuEspace.setText("Espace Enseignant");
+            menuCompte.setText("Compte");
             itemLogout.setText("Déconnexion");
+            notesPanel.setBorder(BorderFactory.createTitledBorder("Liste des Étudiants"));
+            profPanel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
+            modelEtudiants.setColumnIdentifiers(new Object[]{"ID", "Nom", "Prénom", "Email"});
         } else if (lang.equals("EN")) {
-            m1.setText("Manage Grades");
-            m2.setText("Teacher Space");
-            m3.setText("Account");
+            menuGérer.setText("Manage Grades");
+            menuEspace.setText("Teacher Space");
+            menuCompte.setText("Account");
             itemLogout.setText("Logout");
+            notesPanel.setBorder(BorderFactory.createTitledBorder("Students List"));
+            profPanel.setBorder(BorderFactory.createTitledBorder("Teacher Information"));
+            modelEtudiants.setColumnIdentifiers(new Object[]{"ID", "Last Name", "First Name", "Email"});
         } else if (lang.equals("AR")) {
-            m1.setText("إدارة الأعداد");
-            m2.setText("فضاء الأستاذ");
-            m3.setText("الحساب");
+            menuGérer.setText("إدارة الأعداد");
+            menuEspace.setText("فضاء الأستاذ");
+            menuCompte.setText("الحساب");
             itemLogout.setText("تسجيل الخروج");
+            notesPanel.setBorder(BorderFactory.createTitledBorder("قائمة الطلاب"));
+            profPanel.setBorder(BorderFactory.createTitledBorder("معلومات الأستاذ"));
+            modelEtudiants.setColumnIdentifiers(new Object[]{"المعرف", "اللقب", "الاسم", "البريد الإلكتروني"});
         }
+        loadEtudiants();
     }
 
     private JPanel createNotesPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        // Header with Matières button
-        JPanel topPanel = new JPanel(new BorderLayout());
-        JButton btnMatiere = new JButton("Matières");
-        btnMatiere.addActionListener(e -> showMatières());
-        topPanel.add(btnMatiere, BorderLayout.EAST);
-        panel.add(topPanel, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         modelEtudiants = new DefaultTableModel(columns, 0);
@@ -135,29 +144,17 @@ public class EnseignantView extends JPanel {
         return panel;
     }
 
-    private void showMatières() {
-        List<Matiere> matieres = matiereController.findAllMatieres();
-        String[] columns = {"ID", "Nom", "Enseignant"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
-
-        for (Matiere m : matieres) {
-            String profName = (m.getEnseignant() != null) ? m.getEnseignant().getNom() + " " + m.getEnseignant().getPrenom() : "N/A";
-            model.addRow(new Object[]{m.getId(), m.getNom(), profName});
-        }
-
-        JTable table = new JTable(model);
-        JOptionPane.showMessageDialog(this, new JScrollPane(table), "Liste des Matières", JOptionPane.INFORMATION_MESSAGE);
-    }
-
     private JPanel createProfPanel(Utilisateur prof) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel.add(new JLabel("Nom d'utilisateur: " + prof.getUsername()), gbc);
+        lblUserProf = new JLabel("Nom d'utilisateur: " + prof.getUsername());
+        panel.add(lblUserProf, gbc);
         gbc.gridy++;
-        panel.add(new JLabel("Rôle: " + prof.getRole()), gbc);
+        lblRoleProf = new JLabel("Rôle: " + prof.getRole());
+        panel.add(lblRoleProf, gbc);
         return panel;
     }
 

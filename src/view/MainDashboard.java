@@ -14,9 +14,10 @@ public class MainDashboard extends JFrame {
     private Image backgroundImage;
     private Utilisateur currentUser;
 
-    private JMenu menuGestion, menuProf, menuUser, menuLanguage;
-    private JMenuItem itemEtudiants, itemProfs, itemPers, itemNotes, itemLogout;
+    private JMenu menuGestion, menuProf, menuUser, menuLanguage, menuMatiere;
+    private JMenuItem itemEtudiants, itemProfs, itemPers, itemNotes, itemLogout, itemShowMatieres;
     private JMenuItem langFr, langEn, langAr;
+    private String currentLang = "FR";
 
     public MainDashboard(Utilisateur user) {
         this(user, new AuthController());
@@ -32,7 +33,6 @@ public class MainDashboard extends JFrame {
             System.out.println("Erreur: Image introuvable.");
         }
 
-        updateTitle("FR");
         setSize(1100, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -88,11 +88,17 @@ public class MainDashboard extends JFrame {
         if ("ENSEIGNANT".equals(user.getRole())) {
             menuProf = new JMenu();
             itemNotes = new JMenuItem();
-            // FIX: Added the specific listener to load the interactive view
             itemNotes.addActionListener(e -> switchView(new EnseignantView(user, this)));
             menuProf.add(itemNotes);
             menuBar.add(menuProf);
         }
+
+        // Menu Matières for everyone
+        menuMatiere = new JMenu();
+        itemShowMatieres = new JMenuItem();
+        itemShowMatieres.addActionListener(e -> showMatièresDialog());
+        menuMatiere.add(itemShowMatieres);
+        menuBar.add(menuMatiere);
 
         menuUser = new JMenu();
         itemLogout = new JMenuItem();
@@ -115,7 +121,24 @@ public class MainDashboard extends JFrame {
         menuBar.add(menuLanguage);
     }
 
+    private void showMatièresDialog() {
+        controller.MatiereController matiereController = new controller.MatiereController();
+        java.util.List<model.Matiere> matieres = matiereController.findAllMatieres();
+        String[] columns = currentLang.equals("AR") ? new String[]{"المعرف", "الاسم", "الأستاذ"} : 
+                         (currentLang.equals("EN") ? new String[]{"ID", "Name", "Teacher"} : new String[]{"ID", "Nom", "Enseignant"});
+        
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        for (model.Matiere m : matieres) {
+            String profName = (m.getEnseignant() != null) ? m.getEnseignant().getNom() + " " + m.getEnseignant().getPrenom() : "N/A";
+            model.addRow(new Object[]{m.getId(), m.getNom(), profName});
+        }
+        JTable table = new JTable(model);
+        String title = currentLang.equals("AR") ? "قائمة المواد" : (currentLang.equals("EN") ? "List of Subjects" : "Liste des Matières");
+        JOptionPane.showMessageDialog(this, new JScrollPane(table), title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private void translateUI(String lang) {
+        this.currentLang = lang;
         if (lang.equals("FR")) {
             if (menuGestion != null) {
                 menuGestion.setText("Administration");
@@ -127,6 +150,8 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("Espace Enseignant");
                 itemNotes.setText("Gestion des Notes");
             }
+            menuMatiere.setText("Matières");
+            itemShowMatieres.setText("Afficher les Matières");
             menuUser.setText("Compte");
             itemLogout.setText("Déconnexion");
             updateTitle("FR");
@@ -141,6 +166,8 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("Teacher Space");
                 itemNotes.setText("Grades Management");
             }
+            menuMatiere.setText("Subjects");
+            itemShowMatieres.setText("View Subjects");
             menuUser.setText("Account");
             itemLogout.setText("Logout");
             updateTitle("EN");
@@ -155,9 +182,20 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("فضاء الأستاذ");
                 itemNotes.setText("إدارة الأعداد");
             }
+            menuMatiere.setText("المواد");
+            itemShowMatieres.setText("عرض المواد");
             menuUser.setText("الحساب");
             itemLogout.setText("تسجيل الخروج");
             updateTitle("AR");
+        }
+        
+        // Translate the current panel if it supports translation
+        if (container.getComponentCount() > 0) {
+            Component currentPanel = container.getComponent(0);
+            try {
+                java.lang.reflect.Method method = currentPanel.getClass().getMethod("translateUI", String.class);
+                method.invoke(currentPanel, lang);
+            } catch (Exception ignored) {}
         }
     }
 

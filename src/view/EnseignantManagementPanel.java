@@ -19,6 +19,10 @@ public class EnseignantManagementPanel extends JPanel {
     private JTextField txtGrade = new JTextField(10);
     private JTextField txtSpecialite = new JTextField(10);
 
+    private JLabel lblNom, lblPrenom, lblEmail, lblGrade, lblSpecialite;
+    private JButton btnAdd, btnEdit, btnDel, btnRefresh, btnClear;
+    private JPanel formPanel, btnPanel;
+
     public EnseignantManagementPanel() {
         setLayout(new BorderLayout());
 
@@ -31,27 +35,27 @@ public class EnseignantManagementPanel extends JPanel {
         loadData();
 
         // 2. Form Panel
-        JPanel formPanel = new JPanel(new GridLayout(2, 6, 5, 5));
+        formPanel = new JPanel(new GridLayout(2, 6, 5, 5));
         formPanel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
 
-        formPanel.add(new JLabel("Nom:")); formPanel.add(txtNom);
-        formPanel.add(new JLabel("Prénom:")); formPanel.add(txtPrenom);
-        formPanel.add(new JLabel("Email:")); formPanel.add(txtEmail);
-        formPanel.add(new JLabel("Grade:")); formPanel.add(txtGrade);
-        formPanel.add(new JLabel("Spécialité:")); formPanel.add(txtSpecialite);
+        lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
+        lblPrenom = new JLabel("Prénom:"); formPanel.add(lblPrenom); formPanel.add(txtPrenom);
+        lblEmail = new JLabel("Email:"); formPanel.add(lblEmail); formPanel.add(txtEmail);
+        lblGrade = new JLabel("Grade:"); formPanel.add(lblGrade); formPanel.add(txtGrade);
+        lblSpecialite = new JLabel("Spécialité:"); formPanel.add(lblSpecialite); formPanel.add(txtSpecialite);
 
         // 3. Buttons Panel
-        JPanel btnPanel = new JPanel();
-        JButton btnAdd = new JButton("Ajouter");
-        JButton btnEdit = new JButton("Modifier");
-        JButton btnDel = new JButton("Supprimer");
-        JButton btnSave = new JButton("Enregistrer");
-        JButton btnClear = new JButton("Vider");
+        btnPanel = new JPanel();
+        btnAdd = new JButton("Ajouter");
+        btnEdit = new JButton("Modifier");
+        btnDel = new JButton("Supprimer");
+        btnRefresh = new JButton("Actualiser");
+        btnClear = new JButton("Vider");
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnEdit);
         btnPanel.add(btnDel);
-        btnPanel.add(btnSave);
+        btnPanel.add(btnRefresh);
         btnPanel.add(btnClear);
 
         // 4. Layout Assembly
@@ -61,49 +65,17 @@ public class EnseignantManagementPanel extends JPanel {
 
         // --- Action Listeners ---
 
-        // Ajouter (Localement dans la table)
+        // Ajouter (Directement en DB pour avoir l'ID)
         btnAdd.addActionListener(e -> {
-            Object[] row = {
-                    "", // ID empty for now
-                    txtNom.getText(),
-                    txtPrenom.getText(),
-                    txtEmail.getText(),
-                    txtGrade.getText(),
-                    txtSpecialite.getText()
-            };
-            tableModel.addRow(row);
-        });
-
-        // Supprimer
-        btnDel.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row != -1) {
-                Object idObj = tableModel.getValueAt(row, 0);
-                if (idObj != null && !idObj.toString().isEmpty()) {
-                    int id = (int) idObj;
-                    controller.deleteEnseignant(controller.findEnseignantById(id));
-                }
-                tableModel.removeRow(row);
-            } else {
-                JOptionPane.showMessageDialog(this, "Sélectionnez un enseignant à supprimer");
-            }
-        });
-
-        // Enregistrer (Sync with Database)
-        btnSave.addActionListener(e -> {
             try {
                 Enseignant ens = new Enseignant();
                 ens.setNom(txtNom.getText());
                 ens.setPrenom(txtPrenom.getText());
                 ens.setEmail(txtEmail.getText());
                 ens.setGrade(txtGrade.getText());
-                ens.setPassword("123456"); // Password par défaut
-
-                // Note: Specialite is handled via specific setter if not in constructor
-                // ens.setSpecialite(txtSpecialite.getText());
-
+                ens.setPassword("123456"); 
                 controller.addEnseignant(ens);
-                JOptionPane.showMessageDialog(this, "Enseignant enregistré avec succès !");
+                JOptionPane.showMessageDialog(this, "Enseignant ajouté avec succès !");
                 loadData();
                 clearFields();
             } catch (Exception ex) {
@@ -111,8 +83,69 @@ public class EnseignantManagementPanel extends JPanel {
             }
         });
 
+        // Supprimer
+        btnDel.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                int id = (int) tableModel.getValueAt(row, 0);
+                controller.deleteEnseignant(id);
+                loadData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Sélectionnez un enseignant à supprimer");
+            }
+        });
+
+        // Actualiser
+        btnRefresh.addActionListener(e -> loadData());
+
         // Vider les champs
         btnClear.addActionListener(e -> clearFields());
+        
+        translateUI("FR");
+    }
+
+    public void translateUI(String lang) {
+        if (lang.equals("AR")) {
+            formPanel.setBorder(BorderFactory.createTitledBorder("معلومات الأستاذ"));
+            lblNom.setText("اللقب:");
+            lblPrenom.setText("الاسم:");
+            lblEmail.setText("البريد الإلكتروني:");
+            lblGrade.setText("الرتبة:");
+            lblSpecialite.setText("التخصص:");
+            btnAdd.setText("إضافة");
+            btnEdit.setText("تعديل");
+            btnDel.setText("حذف");
+            btnRefresh.setText("تحديث");
+            btnClear.setText("مسح");
+            tableModel.setColumnIdentifiers(new Object[]{"المعرف", "اللقب", "الاسم", "البريد الإلكتروني", "الرتبة", "التخصص"});
+        } else if (lang.equals("EN")) {
+            formPanel.setBorder(BorderFactory.createTitledBorder("Teacher Information"));
+            lblNom.setText("Last Name:");
+            lblPrenom.setText("First Name:");
+            lblEmail.setText("Email:");
+            lblGrade.setText("Grade:");
+            lblSpecialite.setText("Specialty:");
+            btnAdd.setText("Add");
+            btnEdit.setText("Edit");
+            btnDel.setText("Delete");
+            btnRefresh.setText("Refresh");
+            btnClear.setText("Clear");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Last Name", "First Name", "Email", "Grade", "Specialty"});
+        } else {
+            formPanel.setBorder(BorderFactory.createTitledBorder("Informations Enseignant"));
+            lblNom.setText("Nom:");
+            lblPrenom.setText("Prénom:");
+            lblEmail.setText("Email:");
+            lblGrade.setText("Grade:");
+            lblSpecialite.setText("Spécialité:");
+            btnAdd.setText("Ajouter");
+            btnEdit.setText("Modifier");
+            btnDel.setText("Supprimer");
+            btnRefresh.setText("Actualiser");
+            btnClear.setText("Vider");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Nom", "Prénom", "Email", "Grade", "Spécialité"});
+        }
+        loadData();
     }
 
     private void loadData() {

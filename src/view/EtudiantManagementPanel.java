@@ -13,6 +13,10 @@ public class EtudiantManagementPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTextField txtNom = new JTextField(10), txtPrenom = new JTextField(10), txtEmail = new JTextField(15);
 
+    private JLabel lblNom, lblPrenom, lblEmail;
+    private JButton btnAdd, btnEdit, btnDel, btnSave, btnClose;
+    private JPanel formPanel, btnPanel;
+
     public EtudiantManagementPanel() {
         setOpaque(false);
         setLayout(new BorderLayout());
@@ -25,18 +29,18 @@ public class EtudiantManagementPanel extends JPanel {
         loadData();
 
         // Form
-        JPanel formPanel = new JPanel();
-        formPanel.add(new JLabel("Nom:")); formPanel.add(txtNom);
-        formPanel.add(new JLabel("Prénom:")); formPanel.add(txtPrenom);
-        formPanel.add(new JLabel("Email:")); formPanel.add(txtEmail);
+        formPanel = new JPanel();
+        lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
+        lblPrenom = new JLabel("Prénom:"); formPanel.add(lblPrenom); formPanel.add(txtPrenom);
+        lblEmail = new JLabel("Email:"); formPanel.add(lblEmail); formPanel.add(txtEmail);
 
         // Buttons [cite: 24]
-        JPanel btnPanel = new JPanel();
-        JButton btnAdd = new JButton("Ajouter");
-        JButton btnEdit = new JButton("Modifier");
-        JButton btnDel = new JButton("Supprimer");
-        JButton btnSave = new JButton("Enregistrer");
-        JButton btnClose = new JButton("Fermer");
+        btnPanel = new JPanel();
+        btnAdd = new JButton("Ajouter");
+        btnEdit = new JButton("Modifier");
+        btnDel = new JButton("Supprimer");
+        btnSave = new JButton("Enregistrer");
+        btnClose = new JButton("Fermer");
 
         btnPanel.add(btnAdd); btnPanel.add(btnEdit); btnPanel.add(btnDel);
         btnPanel.add(btnSave); btnPanel.add(btnClose);
@@ -62,6 +66,43 @@ public class EtudiantManagementPanel extends JPanel {
         });
 
         btnClose.addActionListener(e -> System.exit(0));
+        
+        translateUI("FR");
+    }
+
+    public void translateUI(String lang) {
+        if (lang.equals("AR")) {
+            lblNom.setText("اللقب:");
+            lblPrenom.setText("الاسم:");
+            lblEmail.setText("البريد الإلكتروني:");
+            btnAdd.setText("إضافة");
+            btnEdit.setText("تعديل");
+            btnDel.setText("حذف");
+            btnSave.setText("حفظ");
+            btnClose.setText("إغلاق");
+            tableModel.setColumnIdentifiers(new Object[]{"المعرف", "اللقب", "الاسم", "البريد الإلكتروني"});
+        } else if (lang.equals("EN")) {
+            lblNom.setText("Last Name:");
+            lblPrenom.setText("First Name:");
+            lblEmail.setText("Email:");
+            btnAdd.setText("Add");
+            btnEdit.setText("Edit");
+            btnDel.setText("Delete");
+            btnSave.setText("Save");
+            btnClose.setText("Close");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Last Name", "First Name", "Email"});
+        } else {
+            lblNom.setText("Nom:");
+            lblPrenom.setText("Prénom:");
+            lblEmail.setText("Email:");
+            btnAdd.setText("Ajouter");
+            btnEdit.setText("Modifier");
+            btnDel.setText("Supprimer");
+            btnSave.setText("Enregistrer");
+            btnClose.setText("Fermer");
+            tableModel.setColumnIdentifiers(new Object[]{"ID", "Nom", "Prénom", "Email"});
+        }
+        loadData();
     }
 
     private void loadData() {
