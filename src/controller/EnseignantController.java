@@ -5,11 +5,11 @@ import model.Enseignant;
 
 import java.util.List;
 
-public class EnseignantController {
+public class EnseignantController implements Validation<Enseignant> {
     private final EnseignantDaoImp dao = new EnseignantDaoImp();
 
     public void addEnseignant(Enseignant enseignant) {
-        validateEnseignant(enseignant);
+        validate(enseignant);
         dao.add(enseignant);
     }
 
@@ -23,7 +23,7 @@ public class EnseignantController {
     }
 
     public void updateEnseignant(Enseignant enseignant) {
-        validateEnseignant(enseignant);
+        validate(enseignant);
         validateId(enseignant.getId());
         dao.update(enseignant);
     }
@@ -41,8 +41,8 @@ public class EnseignantController {
     }
 
 
-
-    private void validateEnseignant(Enseignant enseignant) {
+    @Override
+    public void validate(Enseignant enseignant) {
         if (enseignant == null) {
             throw new IllegalArgumentException("Enseignant invalide");
         }
@@ -56,8 +56,8 @@ public class EnseignantController {
             throw new IllegalArgumentException("L'email est obligatoire");
         }
     }
-
-    private void validateId(int id) {
+    @Override
+    public void validateId(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Id invalide");
         }

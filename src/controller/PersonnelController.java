@@ -7,11 +7,11 @@ import model.Personnel;
 
 import java.util.List;
 
-public class PersonnelController {
+public class PersonnelController implements Validation<Personnel> {
     private final PersonnelDaoImp dao = new PersonnelDaoImp();
 
     public void addPersonnel(Personnel p) {
-        validatePersonnel(p);
+        validate(p);
         dao.add(p);
     }
 
@@ -25,7 +25,7 @@ public class PersonnelController {
     }
 
     public void updatePersonnel(Personnel p) {
-        validatePersonnel(p);
+        validate(p);
         validateId(p.getId());
         dao.update(p);
     }
@@ -41,8 +41,8 @@ public class PersonnelController {
         validateId(id);
         dao.delete(id);
     }
-
-    private void validatePersonnel(Personnel p) {
+    @Override
+    public void validate(Personnel p) {
         if (p == null) {
             throw new IllegalArgumentException("Personnel invalide");
         }
@@ -56,8 +56,8 @@ public class PersonnelController {
             throw new IllegalArgumentException("L'email est obligatoire");
         }
     }
-
-    private void validateId(int id) {
+    @Override
+    public void validateId(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Id invalide");
         }

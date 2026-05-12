@@ -5,11 +5,11 @@ import model.Matiere;
 
 import java.util.List;
 
-public class MatiereController {
+public class MatiereController implements Validation<Matiere> {
     private final MatiereDaoImp dao = new MatiereDaoImp();
 
     public void addMatiere(Matiere matiere) {
-        validateMatiere(matiere);
+        validate(matiere);
         dao.add(matiere);
     }
 
@@ -23,7 +23,7 @@ public class MatiereController {
     }
 
     public void updateMatiere(Matiere matiere) {
-        validateMatiere(matiere);
+        validate(matiere);
         validateId(matiere.getId());
         dao.update(matiere);
     }
@@ -39,8 +39,8 @@ public class MatiereController {
         validateId(id);
         dao.delete(id);
     }
-
-    private void validateMatiere(Matiere matiere) {
+    @Override
+    public void validate(Matiere matiere) {
         if (matiere == null) {
             throw new IllegalArgumentException("Matiere invalide");
         }
@@ -48,8 +48,8 @@ public class MatiereController {
             throw new IllegalArgumentException("Le nom de la matiere est obligatoire");
         }
     }
-
-    private void validateId(int id) {
+    @Override
+    public void validateId(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Id invalide");
         }

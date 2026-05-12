@@ -11,8 +11,6 @@ public class EnseignantManagementPanel extends JPanel {
     private EnseignantController controller = new EnseignantController();
     private JTable table;
     private DefaultTableModel tableModel;
-
-    // Form fields
     private JTextField txtNom = new JTextField(10);
     private JTextField txtPrenom = new JTextField(10);
     private JTextField txtEmail = new JTextField(15);
