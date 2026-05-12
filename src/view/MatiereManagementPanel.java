@@ -44,7 +44,7 @@ public class MatiereManagementPanel extends JPanel {
         btnPanel = new JPanel();
         btnAdd = new JButton("Ajouter");
         btnDel = new JButton("Supprimer");
-        btnRefresh = new JButton("Actualiser");
+        btnRefresh = new JButton("Enregistrer");
         btnClear = new JButton("Vider");
 
         btnPanel.add(btnAdd);

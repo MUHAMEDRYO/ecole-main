@@ -58,16 +58,16 @@ CREATE TABLE IF NOT EXISTS note (
     FOREIGN KEY (enseignant_id) REFERENCES enseignant(id) ON DELETE SET NULL
 );
 
--- 1. Nettoyage (Remove Mohamed if exists as student or teacher to avoid conflicts)
+
 DELETE FROM utilisateur WHERE username = 'mohamed' AND role != 'ADMIN';
 
--- 2. Insert Admins
+
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES (1, 'ayoub', 'a', 'ADMIN');
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES (2, 'mohamed', 'a', 'ADMIN');
 INSERT IGNORE INTO personnel (id, nom, prenom, email, utilisateur_id) VALUES (1, 'rayen', 'bn', 'rayen@school.tn', 1);
 
--- 3. Insert 5 Enseignants (All Informatique)
--- First create their user accounts
+
+
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES 
 (3, 'prof1', 'pass123', 'ENSEIGNANT'),
 (4, 'prof2', 'pass123', 'ENSEIGNANT'),
@@ -75,7 +75,7 @@ INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES
 (6, 'prof4', 'pass123', 'ENSEIGNANT'),
 (7, 'prof5', 'pass123', 'ENSEIGNANT');
 
--- Then link to enseignant table with Informatique specialty
+
 INSERT IGNORE INTO enseignant (id, nom, prenom, email, grade, specialite, utilisateur_id) VALUES 
 (1, 'Trabelsi', 'Mohamed', 'm.trabelsi@isimg.tn', ' ', 'analyse', 3),
 (2, 'Ben Ali', 'Sami', 's.benali@isimg.tn', '', 'algebre', 4),
@@ -83,7 +83,7 @@ INSERT IGNORE INTO enseignant (id, nom, prenom, email, grade, specialite, utilis
 (4, 'Jallouli', 'Ahmed', 'a.jallouli@isimg.tn', '', 'resau', 6),
 (5, 'Mansour', 'Sonia', 's.mansour@isimg.tn', '', 'java', 7);
 
--- 4. Insert 20 Etudiants
+
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES 
 (8, 'std1', 'p', 'ETUDIANT'), (9, 'std2', 'p', 'ETUDIANT'), (10, 'std3', 'p', 'ETUDIANT'), (11, 'std4', 'p', 'ETUDIANT'), 
 (12, 'std5', 'p', 'ETUDIANT'), (13, 'std6', 'p', 'ETUDIANT'), (14, 'std7', 'p', 'ETUDIANT'), (15, 'std8', 'p', 'ETUDIANT'), 
@@ -113,5 +113,5 @@ INSERT IGNORE INTO etudiant (id, nom, prenom, email, utilisateur_id) VALUES
 (19, 'Youssef', 'Anis', 'anis.y@isimg.tn', 26),
 (20, 'Zghal', 'Nour', 'nour.z@isimg.tn', 27);
 
--- 5. Sample Matieres
+
 INSERT IGNORE INTO matiere (id, nom) VALUES (1, 'Java'), (2, 'Base de Données'), (3, 'algebre');

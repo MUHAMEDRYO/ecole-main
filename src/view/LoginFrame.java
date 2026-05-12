@@ -12,8 +12,7 @@ public class LoginFrame extends JFrame {
     private JTextField txtUsername = new JTextField(20);
     private JPasswordField txtPassword = new JPasswordField(20);
     private JButton btnLogin = new JButton("SE CONNECTER");
-
-    // Menu Components
+    //
     private JMenu menuLang = new JMenu("FR 🌐");
     private JMenu menuHelp = new JMenu("Aide");
     private JMenuItem itemContact = new JMenuItem("Contactez l'administrateur");
