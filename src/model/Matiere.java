@@ -1,16 +1,20 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Matiere {
     private int id;
     private String nom;
-    private Enseignant enseignant; // El prof elli i9arri el matiere hethi
+    private List<Enseignant> enseignants = new ArrayList<>(); // El profet elli y9arriw el matiere hethi
 
     public Matiere() {}
 
     public Matiere(int id, String nom, Enseignant enseignant) {
         this.id = id;
         this.nom = nom;
-        this.enseignant = enseignant;
+        setEnseignant(enseignant);
+
     }
 
     public int getId() {
@@ -29,19 +33,27 @@ public class Matiere {
         this.nom = nom;
     }
 
+    public List<Enseignant> getEnseignants() {
+        return enseignants;
+    }
+
+    public void setEnseignants(List<Enseignant> enseignants) {
+        this.enseignants = enseignants;
+    }
+
     public Enseignant getEnseignant() {
-        return enseignant;
+        return enseignants.isEmpty() ? null : enseignants.get(0);
     }
 
     public void setEnseignant(Enseignant enseignant) {
-        this.enseignant = enseignant;
+        enseignants.clear();
+        if (enseignant != null) {
+            enseignants.add(enseignant);
+        }
     }
 
     @Override
     public String toString() {
-        if (enseignant == null || enseignant.getNom() == null || enseignant.getNom().trim().isEmpty()) {
-            return nom;
-        }
-        return nom + " (" + enseignant.getNom() + ")";
+        return nom;
     }
 }

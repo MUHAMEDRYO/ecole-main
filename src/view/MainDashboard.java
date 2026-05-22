@@ -18,7 +18,7 @@ public class MainDashboard extends JFrame {
     private JMenu menuGestion, menuProf, menuUser, menuLanguage, menuMatiere;
     private JMenuItem itemEtudiants, itemProfs, itemPers, itemMatieres, itemNotes, itemLogout, itemShowMatieres;
     private JMenuItem langFr, langEn, langAr;
-    private String currentLang = "FR";
+    private String currentLang = "EN";
 
     public MainDashboard(Utilisateur user) {
         this(user, new AuthController());
@@ -56,7 +56,7 @@ public class MainDashboard extends JFrame {
         setJMenuBar(menuBar);
 
         setupMenus(user, menuBar);
-        translateUI("FR");
+        translateUI("EN");
 
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setOpaque(false);
@@ -154,8 +154,7 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("Espace Enseignant");
                 itemNotes.setText("Gestion des Notes");
             }
-            menuMatiere.setText("Matières");
-            itemShowMatieres.setText("Afficher les Matières");
+
             menuUser.setText("Compte");
             itemLogout.setText("Déconnexion");
             updateTitle("FR");
@@ -171,8 +170,7 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("Teacher Space");
                 itemNotes.setText("Grades Management");
             }
-            menuMatiere.setText("Subjects");
-            itemShowMatieres.setText("View Subjects");
+
             menuUser.setText("Account");
             itemLogout.setText("Logout");
             updateTitle("EN");
@@ -188,8 +186,7 @@ public class MainDashboard extends JFrame {
                 menuProf.setText("فضاء الأستاذ");
                 itemNotes.setText("إدارة الأعداد");
             }
-            menuMatiere.setText("المواد");
-            itemShowMatieres.setText("عرض المواد");
+
             menuUser.setText("الحساب");
             itemLogout.setText("تسجيل الخروج");
             updateTitle("AR");
@@ -206,9 +203,9 @@ public class MainDashboard extends JFrame {
 
     private void initDefaultView(Utilisateur user) {
         if ("ADMIN".equals(user.getRole())) {
-            switchView(new EtudiantManagementPanel());
+            switchView(new AdminPanel(user, this));
         } else if ("ENSEIGNANT".equals(user.getRole())) {
-            // FIX: Pass 'this' parameter
+
             switchView(new EnseignantView(user, this));
         } else if ("PERSONNEL".equals(user.getRole())) {
             switchView(new PersonnelView(user));

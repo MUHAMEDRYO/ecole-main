@@ -55,6 +55,9 @@ public class EnseignantController implements Validation<Enseignant> {
         if (enseignant.getEmail() == null || enseignant.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("L'email est obligatoire");
         }
+        if (enseignant.getSpecialite() == null || enseignant.getSpecialite().getId() <= 0) {
+            throw new IllegalArgumentException("La specialite est obligatoire");
+        }
     }
     @Override
     public void validateId(int id) {

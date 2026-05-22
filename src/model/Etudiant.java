@@ -1,9 +1,13 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Etudiant extends Utilisateur {
     private String nom;
     private String prenom;
     private String email;
+    private List<Note> notes = new ArrayList<>();
 
     public Etudiant() {
         setRole("ETUDIANT");
@@ -68,5 +72,13 @@ public class Etudiant extends Utilisateur {
                 ", email='" + email + '\'' +
                 ", role='" + getRole() + '\'' +
                 '}';
+    }
+
+    public List<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 }

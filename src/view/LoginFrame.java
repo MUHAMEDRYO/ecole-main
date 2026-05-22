@@ -11,19 +11,19 @@ import java.io.IOException;
 public class LoginFrame extends JFrame {
     private JTextField txtUsername = new JTextField(20);
     private JPasswordField txtPassword = new JPasswordField(20);
-    private JButton btnLogin = new JButton("SE CONNECTER");
-    //
-    private JMenu menuLang = new JMenu("FR 🌐");
-    private JMenu menuHelp = new JMenu("Aide");
-    private JMenuItem itemContact = new JMenuItem("Contactez l'administrateur");
+    private JButton btnLogin = new JButton("LOG IN");
+
+    private JMenu menuLang = new JMenu("EN 🌐");
+    private JMenu menuHelp = new JMenu("Help");
+    private JMenuItem itemContact = new JMenuItem("Contact Us");
     private JLabel lblStatus = new JLabel(" ● Online "); // Status indicator
 
     private JLabel lblUser = new JLabel("Email :");
-    private JLabel lblPass = new JLabel("Mot de passe:");
+    private JLabel lblPass = new JLabel("Password :");
 
     private AuthController authController;
     private Image backgroundImage;
-    private String currentLang = "FR";
+    private String currentLang = "EN";
 
     public LoginFrame() {
         this(new AuthController());
@@ -35,7 +35,7 @@ public class LoginFrame extends JFrame {
         try {
             backgroundImage = ImageIO.read(new File("src/img/back1.jpeg"));
         } catch (IOException e) {
-            System.out.println("Erreur: Malqitech el taswira fi src/img/");
+            System.out.println("Erreur: " + e.getMessage());
         }
 
         JMenuBar menuBar = new JMenuBar();
@@ -55,7 +55,7 @@ public class LoginFrame extends JFrame {
         lblStatus.setForeground(new Color(0, 150, 0)); // Green for online
         lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         menuBar.add(menuHelp);
-        menuBar.add(Box.createHorizontalGlue()); // Push language and status to right
+        menuBar.add(Box.createHorizontalGlue());
         menuBar.add(lblStatus);
         menuBar.add(new JSeparator(SwingConstants.VERTICAL));
         menuBar.add(menuLang);

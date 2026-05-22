@@ -2,6 +2,7 @@ package dao;
 
 import config.Connexion;
 import model.Enseignant;
+import model.Matiere;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
     @Override
     public void add(Enseignant entity) {
         String utilisateurSql = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
-        String enseignantSql = "INSERT INTO enseignant (nom, prenom, email, specialite, utilisateur_id) VALUES (?, ?, ?, ?, ?)";
+        String enseignantSql = "INSERT INTO enseignant (nom, prenom, email, specialite_id, utilisateur_id) VALUES (?, ?, ?, ?, ?)";
 
         try {
             connection.setAutoCommit(false);
@@ -41,7 +42,7 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
                 ps.setString(1, entity.getNom());
                 ps.setString(2, entity.getPrenom());
                 ps.setString(3, entity.getEmail());
-                ps.setString(4, entity.getGrade());
+                ps.setInt(4, entity.getSpecialite().getId());
                 ps.setInt(5, utilisateurId);
                 ps.executeUpdate();
 
@@ -63,8 +64,13 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
 
     @Override
     public Enseignant findById(int id) {
-        String sql = "SELECT e.*, u.username, u.password, u.role FROM enseignant e " +
-                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id WHERE e.id = ?";
+        String sql = "SELECT e.id, e.nom, e.prenom, e.email, e.specialite_id, e.utilisateur_id, " +
+                "u.username, u.password, u.role, " +
+                "m.id AS matiere_id, m.nom AS matiere_nom " +
+                "FROM enseignant e " +
+                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id " +
+                "LEFT JOIN matiere m ON e.specialite_id = m.id " +
+                "WHERE e.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -83,8 +89,12 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
 
     @Override
     public List<Enseignant> findAll() {
-        String sql = "SELECT e.*, u.username, u.password, u.role FROM enseignant e " +
-                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id";
+        String sql = "SELECT e.id, e.nom, e.prenom, e.email, e.specialite_id, e.utilisateur_id, " +
+                "u.username, u.password, u.role, " +
+                "m.id AS matiere_id, m.nom AS matiere_nom " +
+                "FROM enseignant e " +
+                "LEFT JOIN utilisateur u ON e.utilisateur_id = u.id " +
+                "LEFT JOIN matiere m ON e.specialite_id = m.id";
         List<Enseignant> enseignants = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -101,7 +111,7 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
 
     @Override
     public void update(Enseignant entity) {
-        String enseignantSql = "UPDATE enseignant SET nom = ?, prenom = ?, email = ?, specialite = ? WHERE id = ?";
+        String enseignantSql = "UPDATE enseignant SET nom = ?, prenom = ?, email = ?, specialite_id = ? WHERE id = ?";
         String utilisateurSql = "UPDATE utilisateur u JOIN enseignant e ON e.utilisateur_id = u.id " +
                 "SET u.username = ?, u.password = ?, u.role = ? WHERE e.id = ?";
 
@@ -109,7 +119,7 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
             ps.setString(1, entity.getNom());
             ps.setString(2, entity.getPrenom());
             ps.setString(3, entity.getEmail());
-            ps.setString(4, entity.getGrade());
+            ps.setInt(4, entity.getSpecialite().getId());
             ps.setInt(5, entity.getId());
             ps.executeUpdate();
 
@@ -138,17 +148,24 @@ public class EnseignantDaoImp implements GenericDao<Enseignant> {
     }
 
     private Enseignant mapEnseignant(ResultSet rs) throws SQLException {
-        Enseignant enseignant = new Enseignant(
-                rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getString("prenom"),
-                rs.getString("email"),
-                rs.getString("specialite")
-        );
+        Enseignant enseignant = new Enseignant();
+        enseignant.setId(rs.getInt("id"));
+        enseignant.setNom(rs.getString("nom"));
+        enseignant.setPrenom(rs.getString("prenom"));
+        enseignant.setEmail(rs.getString("email"));
+        enseignant.setSpecialite(mapSpecialite(rs));
         enseignant.setUsername(getStringIfExists(rs, "username", enseignant.getEmail()));
         enseignant.setPassword(getStringIfExists(rs, "password", null));
         enseignant.setRole(getStringIfExists(rs, "role", "ENSEIGNANT"));
         return enseignant;
+    }
+
+    private Matiere mapSpecialite(ResultSet rs) throws SQLException {
+        int id = rs.getInt("matiere_id");
+        if (rs.wasNull()) {
+            return null;
+        }
+        return new Matiere(id, rs.getString("matiere_nom"), null);
     }
 
     private String getStringIfExists(ResultSet rs, String column, String defaultValue) {

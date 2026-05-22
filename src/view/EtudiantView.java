@@ -38,7 +38,7 @@ public class EtudiantView extends JPanel {
         scrollPane = new JScrollPane(tableNotes);
         add(scrollPane, BorderLayout.CENTER);
         
-        translateUI("FR");
+        translateUI("EN");
     }
 
     public void translateUI(String lang) {
