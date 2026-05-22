@@ -1,6 +1,5 @@
 package config;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +7,7 @@ import java.util.Properties;
 
 public class Connexion {
     private static Connection connection = null;
+    private static Exception connectionError = null;
 
     static {
         // Ista3mel getClassLoader().getResourceAsStream bech yal9ah fil "resources" wala "src"
@@ -34,12 +34,16 @@ public class Connexion {
                 System.out.println("Connexion réussie (Classe Connexion) !");
             }
         } catch (Exception e) {
+            connectionError = e;
             System.err.println("Database connection failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public static Connection getConnection() {
+        if (connection == null && connectionError != null) {
+            throw new IllegalStateException("Database connection failed: " + connectionError.getMessage(), connectionError);
+        }
         return connection;
     }
 }

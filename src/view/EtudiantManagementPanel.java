@@ -21,10 +21,11 @@ public class EtudiantManagementPanel extends JPanel {
         setOpaque(false);
         setLayout(new BorderLayout());
 
-        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
+        setBorder((BorderFactory.createTitledBorder("list of Students")));
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
+
         loadData();
 
         formPanel = new JPanel();
@@ -70,7 +71,7 @@ public class EtudiantManagementPanel extends JPanel {
 
         btnClose.addActionListener(e -> clearFields());
         
-        translateUI("FR");
+        translateUI("EN");
     }
 
     private void clearFields() {

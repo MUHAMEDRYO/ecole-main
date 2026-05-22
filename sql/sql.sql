@@ -8,15 +8,22 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     role ENUM('ADMIN', 'ENSEIGNANT', 'ETUDIANT') NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS matiere (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS enseignant (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     grade VARCHAR(50),
-    specialite VARCHAR(100),
+    specialite_id INT,
     utilisateur_id INT,
-    CONSTRAINT fk_enseignant_user FOREIGN KEY (utilisateur_id) 
+    CONSTRAINT fk_enseignant_matiere FOREIGN KEY (specialite_id)
+        REFERENCES matiere(id) ON DELETE SET NULL,
+    CONSTRAINT fk_enseignant_user FOREIGN KEY (utilisateur_id)
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
@@ -26,7 +33,7 @@ CREATE TABLE IF NOT EXISTS etudiant (
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     utilisateur_id INT,
-    CONSTRAINT fk_etudiant_user FOREIGN KEY (utilisateur_id) 
+    CONSTRAINT fk_etudiant_user FOREIGN KEY (utilisateur_id)
         REFERENCES utilisateur(id) ON DELETE CASCADE
 );
 
@@ -36,13 +43,8 @@ CREATE TABLE IF NOT EXISTS personnel (
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     utilisateur_id INT,
-    CONSTRAINT fk_personnel_user FOREIGN KEY (utilisateur_id) 
+    CONSTRAINT fk_personnel_user FOREIGN KEY (utilisateur_id)
         REFERENCES utilisateur(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS matiere (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS note (
@@ -58,40 +60,42 @@ CREATE TABLE IF NOT EXISTS note (
     FOREIGN KEY (enseignant_id) REFERENCES enseignant(id) ON DELETE SET NULL
 );
 
-
 DELETE FROM utilisateur WHERE username = 'mohamed' AND role != 'ADMIN';
-
 
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES (1, 'ayoub', 'a', 'ADMIN');
 INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES (2, 'mohamed', 'a', 'ADMIN');
 INSERT IGNORE INTO personnel (id, nom, prenom, email, utilisateur_id) VALUES (1, 'rayen', 'bn', 'rayen@school.tn', 1);
 
+INSERT IGNORE INTO matiere (id, nom) VALUES
+(1, 'Java'),
+(2, 'Base de Donnees'),
+(3, 'Algebre'),
+(4, 'Analyse'),
+(5, 'Python'),
+(6, 'Reseau');
 
-
-INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES 
+INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES
 (3, 'prof1', 'pass123', 'ENSEIGNANT'),
 (4, 'prof2', 'pass123', 'ENSEIGNANT'),
 (5, 'prof3', 'pass123', 'ENSEIGNANT'),
 (6, 'prof4', 'pass123', 'ENSEIGNANT'),
 (7, 'prof5', 'pass123', 'ENSEIGNANT');
 
+INSERT IGNORE INTO enseignant (id, nom, prenom, email, grade, specialite_id, utilisateur_id) VALUES
+(1, 'Trabelsi', 'Mohamed', 'm.trabelsi@isimg.tn', ' ', 4, 3),
+(2, 'Ben Ali', 'Sami', 's.benali@isimg.tn', '', 3, 4),
+(3, 'Ghorbel', 'Leila', 'l.ghorbel@isimg.tn', ' de Conference', 5, 5),
+(4, 'Jallouli', 'Ahmed', 'a.jallouli@isimg.tn', '', 6, 6),
+(5, 'Mansour', 'Sonia', 's.mansour@isimg.tn', '', 1, 7);
 
-INSERT IGNORE INTO enseignant (id, nom, prenom, email, grade, specialite, utilisateur_id) VALUES 
-(1, 'Trabelsi', 'Mohamed', 'm.trabelsi@isimg.tn', ' ', 'analyse', 3),
-(2, 'Ben Ali', 'Sami', 's.benali@isimg.tn', '', 'algebre', 4),
-(3, 'Ghorbel', 'Leila', 'l.ghorbel@isimg.tn', ' de Conférence', 'python', 5),
-(4, 'Jallouli', 'Ahmed', 'a.jallouli@isimg.tn', '', 'resau', 6),
-(5, 'Mansour', 'Sonia', 's.mansour@isimg.tn', '', 'java', 7);
-
-
-INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES 
-(8, 'std1', 'p', 'ETUDIANT'), (9, 'std2', 'p', 'ETUDIANT'), (10, 'std3', 'p', 'ETUDIANT'), (11, 'std4', 'p', 'ETUDIANT'), 
-(12, 'std5', 'p', 'ETUDIANT'), (13, 'std6', 'p', 'ETUDIANT'), (14, 'std7', 'p', 'ETUDIANT'), (15, 'std8', 'p', 'ETUDIANT'), 
-(16, 'std9', 'p', 'ETUDIANT'), (17, 'std10', 'p', 'ETUDIANT'), (18, 'std11', 'p', 'ETUDIANT'), (19, 'std12', 'p', 'ETUDIANT'), 
-(20, 'std13', 'p', 'ETUDIANT'), (21, 'std14', 'p', 'ETUDIANT'), (22, 'std15', 'p', 'ETUDIANT'), (23, 'std16', 'p', 'ETUDIANT'), 
+INSERT IGNORE INTO utilisateur (id, username, password, role) VALUES
+(8, 'std1', 'p', 'ETUDIANT'), (9, 'std2', 'p', 'ETUDIANT'), (10, 'std3', 'p', 'ETUDIANT'), (11, 'std4', 'p', 'ETUDIANT'),
+(12, 'std5', 'p', 'ETUDIANT'), (13, 'std6', 'p', 'ETUDIANT'), (14, 'std7', 'p', 'ETUDIANT'), (15, 'std8', 'p', 'ETUDIANT'),
+(16, 'std9', 'p', 'ETUDIANT'), (17, 'std10', 'p', 'ETUDIANT'), (18, 'std11', 'p', 'ETUDIANT'), (19, 'std12', 'p', 'ETUDIANT'),
+(20, 'std13', 'p', 'ETUDIANT'), (21, 'std14', 'p', 'ETUDIANT'), (22, 'std15', 'p', 'ETUDIANT'), (23, 'std16', 'p', 'ETUDIANT'),
 (24, 'std17', 'p', 'ETUDIANT'), (25, 'std18', 'p', 'ETUDIANT'), (26, 'std19', 'p', 'ETUDIANT'), (27, 'std20', 'p', 'ETUDIANT');
 
-INSERT IGNORE INTO etudiant (id, nom, prenom, email, utilisateur_id) VALUES 
+INSERT IGNORE INTO etudiant (id, nom, prenom, email, utilisateur_id) VALUES
 (1, 'Abidi', 'Ali', 'ali.abidi@isimg.tn', 8),
 (2, 'Bouaziz', 'Fatma', 'fatma.b@isimg.tn', 9),
 (3, 'Chaari', 'Yassine', 'yassine.c@isimg.tn', 10),
@@ -112,6 +116,3 @@ INSERT IGNORE INTO etudiant (id, nom, prenom, email, utilisateur_id) VALUES
 (18, 'Turki', 'Salma', 'salma.t@isimg.tn', 25),
 (19, 'Youssef', 'Anis', 'anis.y@isimg.tn', 26),
 (20, 'Zghal', 'Nour', 'nour.z@isimg.tn', 27);
-
-
-INSERT IGNORE INTO matiere (id, nom) VALUES (1, 'Java'), (2, 'Base de Données'), (3, 'algebre');

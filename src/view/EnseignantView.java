@@ -41,7 +41,7 @@ public class EnseignantView extends JPanel {
         menuGérer = new JMenu("Gérer les Notes");
         menuEspace = new JMenu("Espace Enseignant");
 
-        // Compte Menu
+
         menuCompte = new JMenu("Compte");
         menuCompte.add(itemLogout);
 
@@ -85,7 +85,7 @@ public class EnseignantView extends JPanel {
         cards.add(profPanel, "PROFIL");
         add(cards, BorderLayout.CENTER);
         
-        translateUI("FR"); // Default
+        translateUI("EN");
     }
 
     public void translateUI(String lang) {

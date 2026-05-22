@@ -4,30 +4,52 @@ public class Enseignant extends Utilisateur {
     private String nom;
     private String prenom;
     private String email;
-    private String grade;
+    private Matiere specialite;
 
     public Enseignant() {
         setRole("ENSEIGNANT");
     }
 
-    public Enseignant(int id, String nom, String prenom, String email, String grade) {
+    public Enseignant(int id, String nom, String prenom, String email) {
         setId(id);
         setRole("ENSEIGNANT");
         setUsername(email);
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.grade = grade;
+
     }
 
-    public Enseignant(int id, String nom, String prenom, String email, String role, String grade) {
+    public Enseignant(int id, String nom, String prenom, String email,  Matiere specialite) {
+        setId(id);
+        setRole("ENSEIGNANT");
+        setUsername(email);
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+
+        this.specialite = specialite;
+    }
+
+    public Enseignant(int id, String nom, String prenom, String email, String role) {
         setId(id);
         setRole(role);
         setUsername(email);
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.grade = grade;
+
+    }
+
+    public Enseignant(int id, String nom, String prenom, String email, String role, String grade, Matiere specialite) {
+        setId(id);
+        setRole(role);
+        setUsername(email);
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+
+        this.specialite = specialite;
     }
 
     public String getNom() {
@@ -55,12 +77,12 @@ public class Enseignant extends Utilisateur {
         setUsername(email);
     }
 
-    public String getGrade() {
-        return grade;
+    public Matiere getSpecialite() {
+        return specialite;
     }
 
-    public void setGrade(String grade) {
-        this.grade = grade;
+    public void setSpecialite(Matiere specialite) {
+        this.specialite = specialite;
     }
 
     @Override
@@ -71,7 +93,7 @@ public class Enseignant extends Utilisateur {
                 ", prenom='" + prenom + '\'' +
                 ", email='" + email + '\'' +
                 ", role='" + getRole() + '\'' +
-                ", grade='" + grade + '\'' +
+                ", specialite='" + specialite + '\'' +
                 '}';
     }
 }

@@ -23,28 +23,27 @@ public class PersonnelManagementPanel extends JPanel {
 
     public PersonnelManagementPanel() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
+        setBorder(BorderFactory.createTitledBorder("List of staff"));
 
-        // 1. Table Setup
+
         String[] columns = {"ID", "Nom", "Prénom", "Email"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Prevent direct editing in the table cells
+                return false;
             }
         };
         table = new JTable(tableModel);
         loadData();
 
-        // 2. Form Panel
+
         formPanel = new JPanel(new GridLayout(2, 6, 5, 5));
-        formPanel.setBorder(BorderFactory.createTitledBorder("Informations Personnel"));
 
         lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
         lblPrenom = new JLabel("Prénom:"); formPanel.add(lblPrenom); formPanel.add(txtPrenom);
         lblEmail = new JLabel("Email:"); formPanel.add(lblEmail); formPanel.add(txtEmail);
 
-        // 3. Buttons Panel
+
         btnPanel = new JPanel();
         btnAdd = new JButton("Ajouter");
         btnEdit = new JButton("Modifier");
@@ -62,8 +61,6 @@ public class PersonnelManagementPanel extends JPanel {
         add(formPanel, BorderLayout.NORTH);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // --- NEW: Table Selection Listener ---
-        // Fills the text fields when a user clicks a row in the table
         table.getSelectionModel().addListSelectionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
@@ -135,7 +132,7 @@ public class PersonnelManagementPanel extends JPanel {
         btnRefresh.addActionListener(e -> loadData());
         btnClear.addActionListener(e -> clearFields());
 
-        translateUI("FR");
+        translateUI("EN");
     }
 
 

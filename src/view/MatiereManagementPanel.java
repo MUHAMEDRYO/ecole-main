@@ -25,7 +25,7 @@ public class MatiereManagementPanel extends JPanel {
 
     public MatiereManagementPanel() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
+        setBorder(BorderFactory.createTitledBorder("List of subjects"));
 
 
         String[] columns = {"ID", "Nom", "Enseignant"};
@@ -35,7 +35,6 @@ public class MatiereManagementPanel extends JPanel {
 
 
         formPanel = new JPanel(new GridLayout(2, 2, 5, 5));
-        formPanel.setBorder(BorderFactory.createTitledBorder("Informations Matière"));
 
         lblNom = new JLabel("Nom:"); formPanel.add(lblNom); formPanel.add(txtNom);
         lblEnseignant = new JLabel("Enseignant:"); formPanel.add(lblEnseignant); formPanel.add(cbEnseignants);
@@ -63,8 +62,14 @@ public class MatiereManagementPanel extends JPanel {
                 m.setNom(txtNom.getText());
                 m.setEnseignant((Enseignant) cbEnseignants.getSelectedItem());
                 controller.addMatiere(m);
+                Enseignant enseignant = m.getEnseignant();
+                if (enseignant != null) {
+                    enseignant.setSpecialite(m);
+                    enseignantController.updateEnseignant(enseignant);
+                }
                 JOptionPane.showMessageDialog(this, "Matière ajoutée avec succès !");
                 loadData();
+                loadEnseignants();
                 clearFields();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage());
@@ -88,7 +93,7 @@ public class MatiereManagementPanel extends JPanel {
 
         btnClear.addActionListener(e -> clearFields());
 
-        translateUI("FR");
+        translateUI("EN");
     }
 
     private void loadEnseignants() {
