@@ -202,16 +202,9 @@ public class MainDashboard extends JFrame {
     }
 
     private void initDefaultView(Utilisateur user) {
-        if ("ADMIN".equals(user.getRole())) {
-            switchView(new AdminPanel(user, this));
-        } else if ("ENSEIGNANT".equals(user.getRole())) {
 
-            switchView(new EnseignantView(user, this));
-        } else if ("PERSONNEL".equals(user.getRole())) {
-            switchView(new PersonnelView(user));
-        } else {
-            switchView(new EtudiantView(user));
-        }
+            switchView(new AdminPanel(user, this));
+
     }
 
     public void switchView(JPanel panel) {
